@@ -1,8 +1,10 @@
 """
-    "知识问答"的全部接口：
-    1. 创建分组路由实例
-    2. 用户提问（执行查询图）
-    3. 历史会话管理
+    "知识问答页面"的全部API：
+        1.加载历史对话API
+        2.用户提问(执行检索图)API
+        3.SSE实时获取后台节点执行情况API（节点进度、答案增量）
+        4.清空历史对话API
+        5.检查后端服务是否连接API
 """
 import uuid
 from pathlib import Path
@@ -41,11 +43,12 @@ async def query(background_tasks: BackgroundTasks, request: QueryRequest):
         ③判断是否为流式输出(流失则提交后台任务，非流式则同步阻塞执行)，执行查询图，返回响应
 
     Args:
-        background_tasks - 后台任务
         request - 本次请求
+        background_tasks - 后台任务
 
     Returns:
         响应
+
     """
     # 获取用户提问、session_id、流式输出标志
     user_query = request.query
@@ -62,9 +65,9 @@ async def query(background_tasks: BackgroundTasks, request: QueryRequest):
 
     print("开始处理流程... 是否流式:", is_stream, f"其他参数:{user_query}, session_id:{session_id}")
 
+    # 如果是流式，提交后台任务执行查询图，返回响应
+    # 如果非流式，直接执行查询图，返回响应
     if is_stream:
-
-        # 如果是流式，则提交后台任务执行查询图；返回响应
         background_tasks.add_task(run_query_graph, session_id, user_query, is_stream)
         return {
             "message":"结果正在处理中...",
@@ -72,7 +75,6 @@ async def query(background_tasks: BackgroundTasks, request: QueryRequest):
         }
 
     else:
-        # 如果非流式，直接执行查询图；返回响应
         run_query_graph(session_id, user_query, is_stream)
         answer = get_task_result(session_id, "answer", "")
         return {
@@ -83,10 +85,9 @@ async def query(background_tasks: BackgroundTasks, request: QueryRequest):
         }
 
 
-
-
 # 具体后台任务（流式输出）
 def run_query_graph(session_id: str, user_query: str, is_stream: bool = True):
+
     print(f"开始流程图处理...{session_id} {user_query} {is_stream}")
 
     init_state = {
