@@ -27,8 +27,7 @@ query_router = APIRouter(
 
 
 
-
-# 2. 用户提问（执行查询图）API
+# 用户提问（执行查询图）API
 class QueryRequest(BaseModel):
     query: str = Field(..., description="查询内容")
     session_id: str = Field(None, description="会话ID")
@@ -48,11 +47,9 @@ async def query(background_tasks: BackgroundTasks, request: QueryRequest):
     Returns:
         响应
     """
-    # 获取用户提问
+    # 获取用户提问、session_id、流式输出标志
     user_query = request.query
-    # 获取session_id（不存在则uuid自动生成）
     session_id = request.session_id if request.session_id else str(uuid.uuid4())
-    # 获取流式输出标志
     is_stream = request.is_stream
     # 清理该会话上轮查询的任务状态
     clear_task(session_id)
@@ -61,18 +58,19 @@ async def query(background_tasks: BackgroundTasks, request: QueryRequest):
         create_sse_queue(session_id)
 
     # 更新任务状态
-    update_task_status(session_id, TASK_STATUS_PROCESSING,is_stream)
+    update_task_status(session_id, TASK_STATUS_PROCESSING, is_stream)
 
     print("开始处理流程... 是否流式:", is_stream, f"其他参数:{user_query}, session_id:{session_id}")
 
     if is_stream:
+
         # 如果是流式，则提交后台任务执行查询图；返回响应
         background_tasks.add_task(run_query_graph, session_id, user_query, is_stream)
-
         return {
             "message":"结果正在处理中...",
             "session_id":session_id
         }
+
     else:
         # 如果非流式，直接执行查询图；返回响应
         run_query_graph(session_id, user_query, is_stream)

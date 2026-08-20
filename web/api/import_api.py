@@ -23,14 +23,14 @@ from utils.minio_util import get_minio_client
 from utils.task_util import update_task_status, add_done_task, add_running_task, get_task_status, get_done_task_list, \
     get_running_task_list
 
-# 1. 创建分组路由实例
+# 创建分组路由实例
 import_router = APIRouter(
     tags=["资料导入"]
 )
 
 
 
-# 2. 文件上传（执行检索图）
+# 文件上传API（执行检索图）
 @import_router.post("/upload", summary="文件上传接口", description="支持多文件批量上传，触发后台任务：执行导入图")
 async def upload_files(background_tasks: BackgroundTasks, files: List[UploadFile] = File(...)):
     """
@@ -158,7 +158,7 @@ def run_graph_task(task_id: str, file_dir: str, import_file_path: str):
 
 
 
-# 5. 任务状态查询
+# 任务状态查询API
 @import_router.get("/status/{task_id}", summary="任务状态查询", description="根据TaskID查询单个文件的处理进度态")
 async def get_task_progress(task_id: str):
     """
