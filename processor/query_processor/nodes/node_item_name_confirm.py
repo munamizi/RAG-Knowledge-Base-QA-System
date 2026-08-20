@@ -365,10 +365,8 @@ class NodeItemNameConfirm(BaseNode):
 
     def _step_8_write_history(self, state, session_id, rewritten_query, message_id):
         """
-         把本次处理的信息（用户问题、助手答案、商品名、改写查询）写入MongoDB的会话历史
-         核心操作：
-            1. 写入助手答案（若有）；
-            2. 更新用户原始问题的关联信息
+         把本次处理的信息（用户问题、商品名、改写查询）写入MongoDB的会话历史
+         核心操作：更新用户原始问题的关联信息
 
          Args:
             state
@@ -380,24 +378,15 @@ class NodeItemNameConfirm(BaseNode):
              state
          """
 
-        # 若会话状态中有助手答案，写入助手消息到历史
-        if state.get("answer"):
-            save_chat_message(
-                session_id=session_id,
-                role="assistant",
-                text=state["answer"],
-                rewritten_query="",
-                item_names=state.get("item_names", [])
-            )
-        else:
-            save_chat_message(
-                session_id=session_id,
-                role="user",
-                text=state["original_query"],
-                rewritten_query=rewritten_query,
-                item_names=state.get("item_names", []),
-                message_id=message_id
-            )
+
+        save_chat_message(
+            session_id=session_id,
+            role="user",
+            text=state["original_query"],
+            rewritten_query=rewritten_query,
+            item_names=state.get("item_names", []),
+            message_id=message_id
+        )
 
         return state
 
