@@ -5,7 +5,7 @@ from typing import List, Dict, Any
 
 from bson import ObjectId
 from dotenv import load_dotenv
-from pymongo import MongoClient, ASCENDING
+from pymongo import MongoClient, ASCENDING, DESCENDING
 
 load_dotenv(override=True)
 
@@ -175,9 +175,11 @@ def get_recent_messages(session_id: str, limit: int = 10) -> List[Dict[str, Any]
     try:
         query = {"session_id": session_id}
         # 执行查询：按时间戳升序排序，限制返回条数
-        cursor = mongo_tool.chat_message.find(query).sort("ts", ASCENDING).limit(limit)
+        cursor = mongo_tool.chat_message.find(query).sort("ts", DESCENDING).limit(limit)
         messages = list(cursor)
+        messages.reverse()
         return messages
+
     except Exception as e:
         logging.error(f"Error getting recent messages: {e}")
         return []
