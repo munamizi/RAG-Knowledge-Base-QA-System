@@ -28,7 +28,7 @@ query_router = APIRouter(
 
 
 
-# 2. 用户提问（执行查询图）
+# 2. 用户提问（执行查询图）API
 class QueryRequest(BaseModel):
     query: str = Field(..., description="查询内容")
     session_id: str = Field(None, description="会话ID")
@@ -50,13 +50,10 @@ async def query(background_tasks: BackgroundTasks, request: QueryRequest):
     """
     # 获取用户提问
     user_query = request.query
-
     # 获取session_id（不存在则uuid自动生成）
     session_id = request.session_id if request.session_id else str(uuid.uuid4())
-
     # 获取流式输出标志
     is_stream = request.is_stream
-
     # 清理该会话上轮查询的任务状态
     clear_task(session_id)
 
@@ -113,13 +110,10 @@ def run_query_graph(session_id: str, user_query: str, is_stream: bool = True):
 
 
 
-# SSE后端接口
+# SSE后端API
 @query_router.get("/stream/{session_id}")
 async def stream(session_id: str, request: Request):
-
-    """
-    sse 实时返回结果
-    """
+    """SSE得到后端查询图节点执行情况"""
     return StreamingResponse(
         sse_generator(session_id, request),
         media_type="text/event-stream",
@@ -133,21 +127,18 @@ async def stream(session_id: str, request: Request):
 
 
 
-# 3. 历史会话管理
+# 清空历史对话API
 @query_router.delete("/history/{session_id}")
 async def clear_chat_history(session_id: str):
-    """
-    清空指定会话的历史记录
-    """
+    """清空当前历史对话"""
     count = clear_history(session_id)
     return {"message": "历史会话已清空", "deleted_count": count}
 
 
+# 获取历史对话API
 @query_router.get("/history/{session_id}")
 async def history(session_id: str, limit: int = 50):
-    """
-    查询当前会话历史记录
-    """
+    """加载当前历史对话记录"""
     try:
         records = get_recent_messages(session_id, limit=limit)
         items = []
@@ -159,6 +150,7 @@ async def history(session_id: str, limit: int = 50):
                 "text": r.get("text", ""),
                 "rewritten_query": r.get("rewritten_query", ""),
                 "item_names": r.get("item_names", []),
+                "image_urls": r.get("image_urls") or [],
                 "ts": r.get("ts")
             })
         return {"session_id": session_id, "items": items}
@@ -167,7 +159,7 @@ async def history(session_id: str, limit: int = 50):
 
 
 
-# 证明服务器启动即可
+# 检查服务器连接API
 @query_router.get("/health")
 async def health():
     """检查服务是否正常"""

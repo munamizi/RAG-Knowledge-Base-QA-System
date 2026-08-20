@@ -18,6 +18,9 @@ app = FastAPI(
     description="知识库导入与检索问答服务",
 )
 
+# 路由分发
+app.include_router(query_router)
+app.include_router(import_router)
 
 
 # 跨域
@@ -29,13 +32,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-
-# 路由分发
-app.include_router(query_router)
-app.include_router(import_router)
-
 
 
 @app.get("/", include_in_schema=False)
