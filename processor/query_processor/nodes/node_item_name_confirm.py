@@ -21,7 +21,7 @@ load_dotenv(override=True)
 
 class NodeItemNameConfirm(BaseNode):
     """
-    确认用户问题中的核心商品名称
+        主体识别 + 指代消除
     """
 
 
@@ -29,28 +29,28 @@ class NodeItemNameConfirm(BaseNode):
 
     def process(self, state: QueryGraphState) -> QueryGraphState:
 
-        # 步骤1：校验参数
+        # 1.校验参数
         session_id, original_query = self._step_1_validate_param(state)
         logger.info(f"步骤1：参数校验通过")
 
-        # 步骤2：获取历史记录
+        # 2.获取历史记录
         history = get_recent_messages(session_id)
         logger.info(f"步骤2：获取到 {len(history)} 条历史消息")
         state["history"] = history
 
-        # 步骤3：保存用户原始提问
+        # 3.保存用户提问到MongoDB历史对话
         message_id = save_chat_message(session_id, "user", original_query)
         logger.info(f"步骤3：用户原始提问已保存, ID: {message_id}")
 
-        # 步骤4：提取信息
+        # 4.主体识别和指代消除
         extract_res = self._step_4_extract_info(original_query, history)
         item_names = extract_res.get("item_names")
         rewritten_query = extract_res.get("rewritten_query")
-        # 更新状态
+        # 更新state对应字段
         state["item_names"] = item_names
         state["rewritten_query"] = rewritten_query
 
-        # 5.& 6.如果有提取到商品名，进行搜索和对齐
+        # 5&6.如果有提取到商品名，进行评分对齐
         align_result = {}
         if len(item_names) > 0:
             query_results = self._step_5_vectorize_and_query(item_names)
@@ -58,10 +58,10 @@ class NodeItemNameConfirm(BaseNode):
         else:
             logger.info("Node: 未提取到商品名，跳过向量检索")
 
-        # 7. 检查确认状态
+        # 检查确认状态
         state = self._step_7_check_confirmation(state, align_result, history)
 
-        # 8. 写入最终历史
+        # 写入最终历史
         self._step_8_write_history(state, session_id, rewritten_query, message_id)
 
         return state
@@ -86,18 +86,21 @@ class NodeItemNameConfirm(BaseNode):
 
     def _step_4_extract_info(self, query, history) -> Dict:
         """
-        利用LLM从当前问题以及历史会话中提取出主要询问的商品名称item_names（可多个，JSON列表形式）
-        若商品名不够明确则返回空列表，同时根据上下文重新改写问题，保证问题独立完整
+        内容：
+            1.LLM从当前用户问题、历史对话中提取出主要询问的商品名称item_names（可多个，JSON列表形式）若商品名不够明确则返回空列表，
+            2.同时根据上下文重新改写问题，保证问题独立完整
 
         Args:
-            query: str - 用户原始提问
-            history: list[dict] - 近期会话历史，每条消息含role/text等字段，格式：[{"role": "user/assistant", "text": "消息内容", "_id": "消息ID"}, ...]
+            query: str - 用户提问
+            history: list[dict] - 近期会话历史，dict格式：{"role": "user/assistant", "text": "消息内容", "_id": "消息ID"}
 
-        Returns: 字典：
-                     {
-                         "item_names": ["商品名1", "商品名2", ...],  # 提取的商品名列表，无则空列表
-                         "rewritten_query": "改写后的完整问题"       # 包含商品名的独立问题，无则返回原始query
-                     }
+        Returns:
+            字典：
+             {
+                 "item_names": ["商品名1", "商品名2", ...],  # 提取的商品名列表，无则空列表
+                 "rewritten_query": "改写后的用户提问"       # 包含商品名的独立问题，无则返回原始query
+             }
+
         """
         try:
             logger.info("步骤4：正在初始化 LLM 客户端...")
@@ -164,21 +167,18 @@ class NodeItemNameConfirm(BaseNode):
 
     def _step_5_vectorize_and_query(self, item_names: list[str]) -> List[Dict]:
         """
-           把分析出的item_names逐个向量化，并在Milvus向量数据库中执行混合搜索，获取匹配评分
+           把提取到的所有item_names逐个做milvus向量混合检索，获取匹配评分
 
            Args:
-               item_names - 步骤4提取的商品名列表（如["苹果15", "三星A90"]）
+               item_names - （如["商品A", "商品B"]）
 
            Returns:
-               格式：
+               list[dict]
                 [
                     {
-                        "extracted_name": 原始商品名
+                        "extracted_name": 提取商品名
                         "matches": [
-                            {
-                                "item_name": "数据库中的商品名",
-                                "score": 0.98                  # 混合搜索的相似度评分（0-1，越高越相似）
-                            },
+                            {"item_name": "milvus库中的真实商品名", "score": 0.98},
                             ......
                         ]
                     },
@@ -253,59 +253,59 @@ class NodeItemNameConfirm(BaseNode):
         """
         对齐step4提取的item_names，生成「确认商品名」和「候选商品名」
         处理规则：
-                评分＞0.8：
-                    全部取入确定项
-                评分0.6~0.8：
-                    取分数最高前5个作为候选
-                评分＜0.6：
-                    不返回任何商品名（确认+候选均为空）
+                评分＞0.8：全部取入确定项
+                评分0.6~0.8：取分数最高前5个作为候选
+                评分＜0.6：不返回任何商品名（确认+候选均为空）
 
         Args:
-            query_results: list[dict] - step5的返回值
+            query_results: list[dict]
 
         Returns:
             字典 - 商品名对齐结果，包含确认列表和候选列表，格式：
                  {
-                     "confirmed_item_names": ["确认商品名1", "确认商品名2"],  # 无则空列表
-                     "options": ["候选商品名1", "候选商品名2", ...]          # 无则空列表
+                     "confirmed_item_names": ["高分真实商品名1", "高分真实商品名2"],  # 无则空列表
+                     "options": ["中分真实商品名1", "中分真实商品名2", ...]          # 无则空列表
                  }
         """
 
         # 初始化确认商品名列表和候选商品名列表
         confirmed_item_names: List[str] = []
+        all_confirmed_item_names = True
         options: List[str] = []
-
         logger.info(f"步骤6：获得待处理的数据源：{query_results}")
 
         for res in query_results:
-            # 提取原始商品名和匹配结果
-            extracted_name = res.get("extracted_name", "").strip()
+            # 提取匹配结果
             matches = res.get("matches", [])
             # 若无匹配结果，直接跳过当前商品名的对齐
             if not matches:
+                all_confirmed_item_names = False
                 continue
 
-            # 筛选 评分>0.8和[0.6, 0.8]匹配结果：
+            # 筛选 评分>0.8 和 0.6≤评分≤0.8 的匹配结果：
             high = [m for m in matches if m.get("score", 0) > 0.8]
             mid = [m for m in matches if m.get("score", 0) >= 0.6]
 
-            # a：评分>0.8 的全部放入确定项
+            # 评分>0.8 的全部放入确定项后，直接检索下一个，不存options；如果没有则标记all_confirmed_item_names，保证后续不走分支A
             if len(high)>0:
                 for i in high:
                     confirmed_item_names.append(i.get("item_name"))
                 continue
+            else:
+                all_confirmed_item_names = False
 
-            # b：0.8 ≥ 评分 ≥ 0.6分 的取最高前3个作为候选
+            # 0.6 ≤ 评分 ≤ 0.8 的取最高前3个作为候选
             if len(mid) > 0:
                 for m in mid[:3]:
                     options.append(m.get("item_name"))
 
             # c：评分＜0.6 不做任何操作，此时确认、候选列表均为空
 
-        # 返回最终结果：确认列表和候选列表
+        # 返回最终结果：确认列表、全进标志和候选列表
         return {
-            "confirmed_item_names": list(set(confirmed_item_names)),
-            "options": list(set(options))
+            "confirmed_item_names": list(dict.fromkeys(confirmed_item_names)),
+            "all_confirmed_item_names": all_confirmed_item_names,
+            "options": list(dict.fromkeys(options))
         }
 
 
@@ -316,7 +316,7 @@ class NodeItemNameConfirm(BaseNode):
         检查step6对齐后的商品名状态，分支更新state，并同步更新历史消息的商品名关联
 
         Args:
-            state: 状态
+            state
             align_result: dict - step6结果
             history: list[dict] - 近期会话历史
 
@@ -324,18 +324,19 @@ class NodeItemNameConfirm(BaseNode):
             字典 - 更新后的会话状态，item_names、answer
 
         """
-        # 从对齐结果中提取确认商品名列表和候选商品名列表，无则空列表, 批量更新历史消息中的item_name字段
+        # 从对齐结果中提取高分真实商品名列表和中分真实商品名列表，无则空列表, 批量更新历史消息中的item_name字段
         confirmed = align_result.get("confirmed_item_names", [])
         options = align_result.get("options", [])
+        all_confirmed_item_names = align_result.get("all_confirmed_item_names",False)
 
-        # 分支A：有确认的商品名，收集mongodb历史消息中未关联商品名的消息ID，并更新item_names
-        if confirmed:
+        # 分支A：所有涉及的商品都有确认的商品名，收集mongodb历史消息中未关联商品名的消息ID，并更新item_names
+        if confirmed and all_confirmed_item_names:
             ids_to_update = []
             for msg in history:
                 if not msg.get("item_names"):
-                    mid = msg.get("_id")
-                    if mid:
-                        ids_to_update.append(str(mid))
+                    m_id = msg.get("_id")
+                    if m_id:
+                        ids_to_update.append(str(m_id))
             if ids_to_update:
                 update_message_item_names(ids_to_update, confirmed)
 

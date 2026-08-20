@@ -23,7 +23,7 @@ class NodeItemNameRecognition(BaseNode):
 
     def process(self, state: ImportGraphState) -> ImportGraphState:
         """
-        LangGraph 核心节点：商品主体名称识别
+        商品主体名称识别
         流程：
             1. 提取输入
             2. 构建大模型上下文
@@ -70,11 +70,10 @@ class NodeItemNameRecognition(BaseNode):
         Agrs：
             file_title(str)：待被检验的文件标题
             chunks(list[dict[str,str]])：待被检验的chunks
+
         Returns：
             file_title(str)：被检验后的文件标题
             chunks(list[dict[str,str]])：被检验后的chunks
-
-        raise:
 
         """
 

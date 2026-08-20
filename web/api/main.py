@@ -5,8 +5,8 @@ from fastapi import FastAPI, HTTPException
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import FileResponse, RedirectResponse
 
-from web.api.import_service import import_router
-from web.api.query_service import query_router
+from web.api.import_api import import_router
+from web.api.query_api import query_router
 
 PAGE_DIR = Path(__file__).resolve().parent.parent / "page"
 
