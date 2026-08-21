@@ -21,7 +21,7 @@ class NodePDFToMD(BaseNode):
     PDF转Markdown 节点（MinerU）
 
     内容：
-        1.在state里拿pdf_path(pdf文件路径)和file_dir(转化为md文件的输出目录)，校验路径
+        1.在state里拿pdf_path(pdf文件路径)和file_dir(工作目录)，校验路径
         2.调MinerU云端API：上传本地pdf文件，轮询解析结果zip_url
         3.下载并解压md文件
         4.读取md内容
@@ -36,9 +36,9 @@ class NodePDFToMD(BaseNode):
         将pdf通过MineU转化为md文档节点
 
         内容：
-            1.在state里拿pdf_path和 file_dir(转md后最终输出的目录)，校验
+            1.取 state[pdf_path]和 state[file_dir](工作目录)，校验
             2.调MinerU云端API：上传本地pdf文件，轮询解析结果zip_url
-            3.根据zip_url下载并解压md文件，输出到对应目录
+            3.根据zip_url下载包并解压包到工作目录
             4.读取md内容
             5.更新state对应字段：md_path、md_content
 
@@ -47,8 +47,8 @@ class NodePDFToMD(BaseNode):
             state[file_dir] - 转md后最终要输出的目录路径
 
         Returns:
-            state[md_path] - 输出目录
-            state[md_content] - 读取的md文件内容
+            state[md_path] - md文件路径
+            state[md_content] - md文件内容
 
         """
 
@@ -58,7 +58,7 @@ class NodePDFToMD(BaseNode):
         # 2. 上传 PDF 并轮询解析结果
         zip_url = self._step_2_upload_and_poll(pdf_path_obj)
 
-        # 3. 下载并解压包为目录，返回输出目录路径
+        # 3. 下载包并解压包到输出目录，返回md文件路径
         md_path = self._step_3_download_and_extract(
             zip_url=zip_url,
             output_dir_obj=output_dir_obj,
@@ -262,14 +262,14 @@ class NodePDFToMD(BaseNode):
     def _step_3_download_and_extract(self,zip_url: str, output_dir_obj: Path, pdf_stem: str,) -> str:
         """下载 ZIP 并解压 MD到指定目录"""
 
-        # 下载 ZIP(同步阻塞)到内存
+        # 下载 zip(同步阻塞)到内存
         response = requests.get(zip_url)
 
         if response.status_code != 200:
             raise RuntimeError(
                 f"ZIP 下载失败：{response.status_code}"
             )
-        # 将内存zip持久化进外存
+        # 将内存zip持久化进外存工作目录
         zip_save_path = (
             output_dir_obj / f"{pdf_stem}_result.zip"
         )
@@ -288,11 +288,11 @@ class NodePDFToMD(BaseNode):
             exist_ok=True,
         )
 
-        # 解压 ZIP
+        # 解压 zip 到工作目录
         with zipfile.ZipFile(zip_save_path, "r") as zip_file_obj:
             zip_file_obj.extractall(extract_target_dir)
 
-        # 重命名 md 文件
+        # 重命名MinerU默认的md文件名
         target_md_file = extract_target_dir / "full.md"
 
         new_md_path = target_md_file.with_name(

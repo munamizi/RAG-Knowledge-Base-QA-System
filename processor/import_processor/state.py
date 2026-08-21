@@ -8,17 +8,17 @@ class ImportGraphState(TypedDict):
     task_id: str                    # 上传资料的任务id
     import_file_path: str           # 上传资料的路径
 
-    is_md_read_enabled: bool        # MD文件格式标记
-    md_path: str                    # MD文件路径
-    is_pdf_read_enabled: bool       # PDF文件格式标记
-    pdf_path: str                   # PDF文件路径
+    is_md_read_enabled: bool        # md格式标记
+    md_path: str                    # md文件路径
+    is_pdf_read_enabled: bool       # pdf格式标记
+    pdf_path: str                   # pdf文件路径
 
     file_title: str                 # 上传资料的文件名
-    file_dir: str                   # 导出文件目录
+    file_dir: str                   # 工作目录(下载MinerU压缩包的目录、解压的根目录)
 
     item_name: str                  # 识别出的商品名称
 
-    md_content: str                 # MD文档内容
+    md_content: str                 # md文档内容
     chunks: List                    # 文档切片列表
 
 
