@@ -9,44 +9,52 @@ from utils.logger import logger
 
 # 长切阈值
 DEFAULT_MAX_CONTENT_LENGTH = 2000
-
 # 短合阈值
 MIN_CONTENT_LENGTH = 500
 
 class NodeDocumentSplit(BaseNode):
-    """
-    文档切分节点:把一篇长 Markdown 切成一个个小 Chunk,方便后续做向量检索。
-    思路:先按标题切大块,再长切短合
-    """
 
     name: str = "node_document_split"
 
     def process(self, state: ImportGraphState) -> ImportGraphState:
         """
-        节点主流程,一共 6 步:
-        1. 拿输入数据
-        2. 按标题切大块
-        3. 没标题就兜底处理
-        4. 长切小、短合并
-        5. 打印统计信息
-        6. 备份到本地 JSON
+        文档切分节点：对 md 先按标题粗切,再根据阈值长切短合为合适的chunks
 
-        输入： (state: task_id、md_path、md_content、file_title)
-        输出： (state: chunks)
+        内容：
+            1. 拿输入数据
+            2. 按标题粗切。没标题就兜底处理
+            3. 长切过滤、短合过滤
+            4. 打印统计信息
+            5. 备份到本地 JSON
+
+        Args:
+            state[md_path] - 新 md文件路径
+            state[md_content] - 新 md文件内容
+            state[file_title] - 上传资料文件名
+
+        Returns:
+             state[chunks]: list[dict] - 切分后的chunks
+
         """
 
-        # 1. 拿到md内容和文件标题 + 换行标准化
+        # 1. 拿到md内容和文件标题校验、换行标准化，返回md内容和上传文件名
         content, file_title = self._step_1_get_inputs(state)
-        # 2. 按 #、##、### 这种标题切分
+
+        # 2. 按 1~6 # 进行标题粗切，返回一个元组
         sections, title_count, lines_count = self._step_2_split_by_titles(content, file_title)
-        # 3. 如果整篇没有标题,把全文当成一个 Chunk
-        sections = self._step_3_handle_no_title(content, sections, title_count, file_title)
-        # 4. 太长的章节切小,太短的章节合并
+        # 过滤：如果粗切后的chunks都没有标题,就把全文当成一个section返回
+        sections = self._step_3_handle_chunks_no_title(sections, title_count, content,  file_title)
+
+        # 3. 太长的section切小, 太短的section合并
         sections = self._step_4_refine_chunks(sections)
-        # 5. 打印切分结果,方便调试
+
+        # 4. 打印切分结果,方便调试
         self._step_5_print_stats(lines_count, sections)
-        # 6. 把切分结果存一份到本地,排查问题用
+
+        # 5. 把切分结果存一份到本地,排查问题用
         self._step_6_backup(state, sections)
+
+        # 更新state[chunks]
         state["chunks"] = sections
         return state
 
@@ -54,15 +62,16 @@ class NodeDocumentSplit(BaseNode):
 
 
     def _step_1_get_inputs(self, state: ImportGraphState) -> Tuple[str, str]:
-        """拿到md内容和文件标题 + 换行标准化：从 state 里取出 MD 内容和文件标题,做点基础清理。"""
-        # 文件标题不能为空
+        """从 state 里取出 md 内容和文件名,做基础清理。"""
+
         file_title = state.get("file_title", "")
         if not file_title:
             raise ValueError("核心参数 file_title 缺失")
-        # MD 内容不能为空
+
         md_content = state.get("md_content", "")
         if not md_content:
             raise ValueError("核心参数 md_content 缺失")
+
         # 统一换行符：把 Windows 的 \r\n 和老 Mac 的 \r 都换成 \n
         md_content = md_content.replace("\r\n", "\n").replace("\r", "\n")
         logger.info(f"步骤1:输入数据加载完成,文件标题:{file_title}")
@@ -70,20 +79,35 @@ class NodeDocumentSplit(BaseNode):
 
 
 
-
-    def _step_2_split_by_titles(
-        self,
-        content: str,
-        file_title: str
-    ) -> Tuple[List[Dict[str, str]], int, int]:
+    def _step_2_split_by_titles(self, content: str, file_title: str) -> Tuple[List[Dict[str, str]], int, int]:
         """
         按标题切大块:
-            按 Markdown 标题(# ## ### ...)切分,每个标题下的内容算一个章节；
-            代码块里的 # 不算标题,要跳过。
+            按 md 的标题(# ## ### ...)切分,每个标题下的内容算一个章节；
+            注意：代码块里的 # 不算标题,要跳过。
+
+        Args:
+            content - md内容
+            file_title - 上传资料文件名
+
+        Returns:
+            Tuple(list[dict]、int、int)
+            (
+                [
+                    {
+                      'title': 当前块所在标题
+                      'content': 当前块内容
+                      'file_title': 当前资料文件名
+                    },
+                    ......
+                ],
+                标题总数,
+                md总行数,
+            )
+
         """
         # 把md按换行分割成一个行列表，等待后续被检索
         lines = content.split("\n")
-        # 标题正则：匹配 1~6 级标题:行首可有空格,然后 1~6 个 #,后面必须有空格和文字
+        # 标题正则：匹配 1~6 级标题:行首可有空格,然后 1~6 个#, #后必须有空格和文字
         title_pattern = r'\s*#{1,6}\s+.+'
         # sections列表
         sections: List[Dict[str, str]] = []
@@ -95,7 +119,6 @@ class NodeDocumentSplit(BaseNode):
         # 记一下进入代码块时用的是 ``` 还是 ~~~, 要用同样的才算结束
         code_block_start_marker = None
 
-
         def _flush_section():
             """把当前累积的内容存成一个section。"""
             if not current_lines:
@@ -105,6 +128,7 @@ class NodeDocumentSplit(BaseNode):
                 "content": "\n".join(current_lines),
                 "file_title": file_title,
             })
+
         # 逐行分析：
         for line in lines:
             # 去掉该行的首尾空格符
@@ -139,25 +163,40 @@ class NodeDocumentSplit(BaseNode):
                 # 普通行,追加到当前章节
                 current_lines.append(line)
 
-        # 别忘了最后一个章节
+        # 最后一个章节
         _flush_section()
 
-        logger.info(
-            f"按标题切分完成,共 {len(sections)} 个章节,标题数 {title_count},原始行数 {len(lines)}"
-        )
+        logger.info(f"按标题切分完成,共 {len(sections)} 个章节,标题数 {title_count},原始行数 {len(lines)}")
+
         return sections, title_count, len(lines)
 
 
 
-
-    def _step_3_handle_no_title(
+    def _step_3_handle_chunks_no_title(
         self,
-        content: str,
         sections: List[Dict[str, str]],
         title_count: int,
+        content: str,
         file_title: str,
     ) -> List[Dict[str, str]]:
-        """无标题兜底：如果整篇文档没有任何标题(纯文本),就把全文当成一个章节,免得后面拿到空列表。"""
+        """
+        无标题整合：如果md粗切后的chunks都没有标题,就把全文当成一个section
+
+        Args:
+            content - md内容
+            sections - 上步骤粗切后的所有块
+            title_count - 粗切后统计的标题数量
+            file_title - 上传资料名
+
+        Returns:
+            section: ditc
+            {
+                "title": "无标题",
+                "content": md内容,
+                "file_title": 上传资料名
+            }
+
+        """
         if title_count == 0:
             logger.warning(f"没识别到任何 MD 标题,把全文当成一个章节处理:{file_title}")
             return [
@@ -167,8 +206,8 @@ class NodeDocumentSplit(BaseNode):
                     "file_title": file_title
                  }
             ]
-        return sections
 
+        return sections
 
 
 
@@ -178,7 +217,15 @@ class NodeDocumentSplit(BaseNode):
         1. 太长的章节切成小块
         2. 太短的章节合并起来
         3. 给每个 Chunk 补上 parent_title 字段(Milvus 入库要用,不能是 None)
+
+        Args:
+            sections - 上哥步骤粗切和过滤后的chunks
+
+        Returns:
+            final_sections - 长切短合后的最终chunks
+
         """
+
         refined_split: List[Dict[str, str]] = []
 
         for sec in sections:
@@ -199,36 +246,42 @@ class NodeDocumentSplit(BaseNode):
 
     def _split_long_section(self, section: Dict[str, str]) -> List[Dict[str, str]]:
         """
-        把超长章节切小。
-        切的时候每一小块都带上原标题,这样单独看一个 Chunk 也知道它属于哪个章节。
+        把超过阈值上限的section切小（切后的每一小块都带上parent_title和part, 这样知道它属于哪个父section）
+
+        Args:
+            section - 一个section
+
+        Returns:
+            sections - 长切后的secitions
+
         """
+
         content = section.get("content", "")
-        # 没超长就不用切
+
         if len(content) <= DEFAULT_MAX_CONTENT_LENGTH:
             return [section]
-        title = section.get("title", "")
 
+        title = section.get("title", "")
         # 每个小块都加上 "标题\n\n" 作为前缀
         prefix = f"{title}\n\n" if title else ""
 
         # 减去前缀长度,正文部分最多能有多少字
         available_len = DEFAULT_MAX_CONTENT_LENGTH - len(prefix)
         if available_len <= 0:
-            # 标题本身就超长了,没法切,直接返回原章节
             logger.warning(f"标题太长无法切分:{title[:20]}...")
             return [section]
 
-        # 正文开头通常会重复一遍标题,把它去掉,免得切完每块都重复
         body = content
         if title and body.lstrip().startswith(title):
             body = body[body.find(title) + len(title):].lstrip()
 
-        # 用 LangChain 的RAG组件递归切分器
+        # 用 LangChain 递归分割器切
         splitter = RecursiveCharacterTextSplitter(
             chunk_size=available_len,
             chunk_overlap=0,  # 已经按标题切过了,不需要重叠
             separators=["\n\n", "\n", "。", "!", "?", ";", ".", "!", "?", ";", " "],
         )
+
         sub_sections: List[Dict[str, str]] = []
         # enumerate 同时拿到序号和内容,start=1 让序号从 1 开始
         for idx, chunk in enumerate(splitter.split_text(body), start=1):
@@ -246,14 +299,19 @@ class NodeDocumentSplit(BaseNode):
         return sub_sections
 
 
-    def _merge_short_sections(
-        self, sections: List[Dict[str, str]]
-    ) -> List[Dict[str, str]]:
+    def _merge_short_sections(self, sections: List[Dict[str, str]]) -> List[Dict[str, str]]:
         """
-        把太短的相邻 Chunk 合并起来。
-        合并条件:
+        把太短的相邻 sections 合并。
+        合并必须同时满足条件:
           1. 当前块长度小于 MIN_CONTENT_LENGTH
-          2. 下一块和当前块属于同一个父标题(不同章节不合,免得语义乱)
+          2. 当前块和下一块属于同一个父标题(parent_title相同)
+
+        Args:
+            sections - 长切过滤后的sections
+
+        Returns:
+            sections - 短合过滤后的sections
+
         """
         if not sections:
             return []
@@ -300,7 +358,6 @@ class NodeDocumentSplit(BaseNode):
 
 
 
-
     def _step_5_print_stats(self, lines_count: int, sections: List[Dict[str, str]]) -> None:
         """打印统计：打印切分结果,方便看效果和排查问题。"""
         chunk_num = len(sections)
@@ -310,9 +367,8 @@ class NodeDocumentSplit(BaseNode):
 
 
 
-
     def _step_6_backup(self, state: ImportGraphState, sections: List[Dict[str, str]]) -> None:
-        """本地备份：把切分结果存成 chunks.json,放在 MD 文件同目录下,排查问题时随时能看。"""
+        """本地备份：把切分结果存成 chunks.json,放在 md 文件同目录下,方面排查问题。"""
 
         try:
             # 备份文件路径:和 MD 文件同目录,固定叫 chunks.json
