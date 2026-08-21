@@ -6,23 +6,30 @@ from utils.logger import logger
 
 
 class NodeEntry(BaseNode):
-    """
-    入口节点：“导入流程的任务分发器”
 
-        作用：
-            1. 校验用户上传的文件路径是否合法
-            2. 判断文件类型（PDF / Markdown）
-            3. 为后续条件边设置标记
-            4. 提取文件标题作为元数据
-
-    """
 
     # 当前节点名称
     name = "node_entry"
 
     def process(self, state: ImportGraphState):
+        """
+        任务分发节点
 
-        # 1. 获取上传文件路径
+        内容：
+            1. 校验用户上传的文件路径state[import_file_path]是否有效
+            2. 判断文件类型（PDF / Markdown），更新state对应类型的标记和路径字段
+            3. 提取文件名更新到state[file_title]
+
+        Args:
+            state[import_file_path]
+
+        Returns:
+            state[is_pdf_read_enabled],state[md_path] / state[is_md_read_enabled],state[md_path]
+            state[file_title]
+
+        """
+
+        # 获取上传文件路径
         import_file_path = state.get('import_file_path', '')
 
         # 若路径为空抛出异常
@@ -33,7 +40,6 @@ class NodeEntry(BaseNode):
                 expected_type=str
             )
 
-        # 2. 路径Path对象化方便操作路径
         import_file_path_obj = Path(import_file_path)
 
         # 若文件不存在抛出异常
@@ -44,7 +50,7 @@ class NodeEntry(BaseNode):
                 expected_type=Path
             )
 
-        # 3. 根据文件类型设置条件边的标记
+        # 根据文件类型设置state条件边标记
         if import_file_path_obj.suffix == '.pdf':
 
             state['is_pdf_read_enabled'] = True
@@ -65,10 +71,10 @@ class NodeEntry(BaseNode):
                 node_name=self.name
             )
 
-        # 4. 提取文件名
+        # 提取文件名
         state['file_title'] = import_file_path_obj.stem
 
-        # 5. 返回更新后的状态
+        # 返回更新后的状态
         return state
 
 

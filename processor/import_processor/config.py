@@ -102,8 +102,8 @@ class ImportConfig:
 
 
 # ==================== 全局单例 ====================
-_config: Optional[ImportConfig] = None
 
+_config: Optional[ImportConfig] = None
 def get_config() -> ImportConfig:
     """工厂模式获取配置单例"""
     global _config

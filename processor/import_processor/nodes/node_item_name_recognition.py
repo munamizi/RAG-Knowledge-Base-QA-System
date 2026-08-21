@@ -16,7 +16,7 @@ from utils.milvus_client_util import get_milvus_client
 
 class NodeItemNameRecognition(BaseNode):
     """
-    主体识别节点（业务强要求：要求输入的一个md文档讲的是一个商品）
+    构造主体识别节点（业务强要求：要求输入的一个md文档讲的是一个商品）
     """
 
     name = "node_item_name_recognition"

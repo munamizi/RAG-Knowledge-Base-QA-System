@@ -25,8 +25,6 @@ class QueryGraphState(TypedDict):
 
     # ——————————辅助——————————————————
     item_names: List[str]  # 提取的商品名
-    # 保证所有大于0.8分的item_names检索结果都进入item_names_confirmed，保证后续对用户问题中的所有商品都可以检索
-    all_confirmed_item_names: bool
     rewritten_query: str   # 改写后的问题
     history: list          # 历史对话记录
     is_stream: bool        # 是否流式输出

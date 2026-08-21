@@ -33,7 +33,7 @@ class NodeItemNameConfirm(BaseNode):
         session_id, original_query = self._step_1_validate_param(state)
         logger.info(f"步骤1：参数校验通过")
 
-        # 2.获取历史记录
+        # 2.获取历史对话记录
         history = get_recent_messages(session_id)
         logger.info(f"步骤2：获取到 {len(history)} 条历史消息")
         state["history"] = history
@@ -251,7 +251,7 @@ class NodeItemNameConfirm(BaseNode):
 
     def _step_6_align_item_names(self, query_results) -> dict:
         """
-        对齐step4提取的item_names，生成「确认商品名」和「候选商品名」
+        对齐step4提取的item_names，做评分对齐，生成「确认商品名」和「候选商品名」
         处理规则：
                 评分＞0.8：全部取入确定项
                 评分0.6~0.8：取分数最高前5个作为候选
@@ -313,7 +313,7 @@ class NodeItemNameConfirm(BaseNode):
 
     def _step_7_check_confirmation(self, state, align_result, history):
         """
-        检查step6对齐后的商品名状态，分支更新state，并同步更新历史消息的商品名关联
+        检查step6评分对齐后的结果做条件分支
 
         Args:
             state
@@ -329,7 +329,7 @@ class NodeItemNameConfirm(BaseNode):
         options = align_result.get("options", [])
         all_confirmed_item_names = align_result.get("all_confirmed_item_names",False)
 
-        # 分支A：所有涉及的商品都有确认的商品名，收集mongodb历史消息中未关联商品名的消息ID，并更新item_names
+        # 分支A：所有涉及的商品都有高分商品名，收集mongodb历史消息中未关联商品名的消息ID，并更新item_names
         if confirmed and all_confirmed_item_names:
             ids_to_update = []
             for msg in history:

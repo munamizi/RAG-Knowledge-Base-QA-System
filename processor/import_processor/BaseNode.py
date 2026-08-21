@@ -52,6 +52,7 @@ class BaseNode(ABC):
 
             # 记录节点结束状态
             add_done_task(state["task_id"], self.name)
+
             # 记录日志结束
             logger.info(f"--- {self.name} 完成 ---")
 

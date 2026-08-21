@@ -18,8 +18,9 @@ from utils.logger import logger
 
 class NodePDFToMD(BaseNode):
     """
-    PDF 转 Markdown 节点：通过MinerU将pdf转化为markdown
-        作用：
+    PDF转Markdown 节点（MinerU）
+
+    内容：
         1.在state里拿pdf_path(pdf文件路径)和file_dir(转化为md文件的输出目录)，校验路径
         2.调MinerU云端API：上传本地pdf文件，轮询解析结果zip_url
         3.下载并解压md文件
@@ -32,74 +33,88 @@ class NodePDFToMD(BaseNode):
 
     def process(self, state: ImportGraphState):
         """
-        输入:
-            pdf_path
-            file_dir
+        将pdf通过MineU转化为md文档节点
 
-        输出:
-            md_path
-            md_content
+        内容：
+            1.在state里拿pdf_path和 file_dir(转md后最终输出的目录)，校验
+            2.调MinerU云端API：上传本地pdf文件，轮询解析结果zip_url
+            3.根据zip_url下载并解压md文件，输出到对应目录
+            4.读取md内容
+            5.更新state对应字段：md_path、md_content
+
+        Args:
+            state[pdf_path] - 上传的pdf文件路径
+            state[file_dir] - 转md后最终要输出的目录路径
+
+        Returns:
+            state[md_path] - 输出目录
+            state[md_content] - 读取的md文件内容
+
         """
 
-        # 1. 校验路径
+        # 1. 校验两个路径，返回对应Path对象
         pdf_path_obj, output_dir_obj = self._step_1_validate_paths(state)
 
         # 2. 上传 PDF 并轮询解析结果
         zip_url = self._step_2_upload_and_poll(pdf_path_obj)
 
-        # 3. 下载并解压 Markdown
+        # 3. 下载并解压包为目录，返回输出目录路径
         md_path = self._step_3_download_and_extract(
             zip_url=zip_url,
             output_dir_obj=output_dir_obj,
             pdf_stem=pdf_path_obj.stem,
         )
 
-        # 4. 读取 Markdown 内容
+        # 4. 读取 md 内容
         with open(md_path, "r", encoding="utf-8") as f:
             md_content = f.read()
 
-        # 5. 更新 state
+        # 5. 更新对应state字段
         return {
             "md_path": str(md_path),
             "md_content": md_content,
         }
+
+
 
     def _step_1_validate_paths(self, state: ImportGraphState):
         """
         校验 PDF 路径与输出目录
         """
 
-        # 1. 获取 PDF 路径
+        # 获取pdf路径
         pdf_path = state.get("pdf_path")
         if not pdf_path:
             raise StateFieldError(field_name="pdf_path", expected_type=str)
 
-        # 2. 获取输出目录
+        # 获取输出目录
         file_dir = state.get("file_dir")
         if not file_dir:
             raise StateFieldError(field_name="file_dir", expected_type=str)
 
-        # 3. 转换为 Path 对象
+        # 转换为 Path 对象
         pdf_path_obj = Path(pdf_path)
         file_dir_obj = Path(file_dir)
 
-        # 4. 校验 PDF 是否存在
+        # 校验 PDF路径对应文件是否存在
         if not pdf_path_obj.exists():
             raise FileProcessingError(message=f"PDF 文件不存在：{pdf_path_obj}")
 
-        # 5. 自动创建输出目录
+        # 保证输出目录对应真实目录存在
         if not file_dir_obj.exists():
             logger.info(f"输出目录不存在，自动创建：{file_dir_obj.absolute()}")
             file_dir_obj.mkdir(parents=True, exist_ok=True)
 
         return pdf_path_obj, file_dir_obj
 
+
+
     def _step_2_upload_and_poll(self, pdf_path_obj: Path):
         """
         上传 PDF 到 MinerU，并轮询解析结果zip_url
         """
 
-        # 1. 校验 MinerU 配置
+        # 校验 MinerU 配置
         if not mineru_config.base_url:
             raise ConfigurationError(
                 "缺少 MINERU_BASE_URL 配置"
@@ -112,7 +127,7 @@ class NodePDFToMD(BaseNode):
 
         token = mineru_config.api_token
 
-        # 2. 获取上传链接
+        # 获取上传链接
         url = f"{mineru_config.base_url}/file-urls/batch"
         header = {
             "Content-Type": "application/json",
@@ -242,17 +257,12 @@ class NodePDFToMD(BaseNode):
 
             time.sleep(poll_interval)
 
-    def _step_3_download_and_extract(
-        self,
-        zip_url: str,
-        output_dir_obj: Path,
-        pdf_stem: str,
-    ) -> str:
-        """
-        下载 ZIP 并解压 MD到指定目录
-        """
 
-        # 1. 下载 ZIP(同步阻塞)到内存
+
+    def _step_3_download_and_extract(self,zip_url: str, output_dir_obj: Path, pdf_stem: str,) -> str:
+        """下载 ZIP 并解压 MD到指定目录"""
+
+        # 下载 ZIP(同步阻塞)到内存
         response = requests.get(zip_url)
 
         if response.status_code != 200:
@@ -267,7 +277,7 @@ class NodePDFToMD(BaseNode):
         with open(zip_save_path, "wb") as f:
             f.write(response.content)
 
-        # 2. 准备解压目录
+        # 准备解压目录
         extract_target_dir = output_dir_obj / pdf_stem
 
         # 如果存在旧目录，全部删除重新建立
@@ -278,11 +288,11 @@ class NodePDFToMD(BaseNode):
             exist_ok=True,
         )
 
-        # 3. 解压 ZIP
+        # 解压 ZIP
         with zipfile.ZipFile(zip_save_path, "r") as zip_file_obj:
             zip_file_obj.extractall(extract_target_dir)
 
-        # 重命名 MD 文件
+        # 重命名 md 文件
         target_md_file = extract_target_dir / "full.md"
 
         new_md_path = target_md_file.with_name(

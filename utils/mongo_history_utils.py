@@ -136,7 +136,7 @@ def update_message_item_names(ids: List[str], item_names: List[str]) -> int:
     """
     批量更新历史会话记录的关联商品名称
     Args:
-        ids: 要更新的记录主键ID列表
+        ids: 要更新BSON文档的对应id列表
         item_names: 要设置的新商品名称列表
 
     """
