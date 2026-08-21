@@ -29,7 +29,7 @@ GRAPH_DEFAULT_STATE: ImportGraphState = {
     "task_id": "",
     "import_file_path": r"C:\Users\Zong6\Desktop\04-设备手册汇总\doc\hak180使用说明书.pdf",
 
-    "is_pdf_read_enabled": True,
+    "is_pdf_read_enabled": False,
     "pdf_path": "",
     "is_md_read_enabled": False,
     "md_path": "",

@@ -50,7 +50,7 @@ class NodeEntry(BaseNode):
                 expected_type=Path
             )
 
-        # 根据文件类型设置state条件边标记
+        # 判断文件类型，设置state字段
         if import_file_path_obj.suffix == '.pdf':
 
             state['is_pdf_read_enabled'] = True
@@ -60,6 +60,8 @@ class NodeEntry(BaseNode):
 
             state['is_md_read_enabled'] = True
             state['md_path'] = import_file_path
+            # 直接将md文件内容更新到state[md_content]
+            state["md_content"] = import_file_path_obj.read_text(encoding="utf-8-sig")
 
         else:
             logger.error(
@@ -74,7 +76,7 @@ class NodeEntry(BaseNode):
         # 提取文件名
         state['file_title'] = import_file_path_obj.stem
 
-        # 返回更新后的状态
+        # 更新状态
         return state
 
 
