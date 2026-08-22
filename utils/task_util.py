@@ -98,7 +98,7 @@ def add_running_task(task_id: str, node_name: str, is_stream: bool = False) -> N
     添加“正在执行节点”
 
     Args：
-        task_id - 任务ID
+        task_id - 任务id
         node_name - 节点名
     """
     _ensure_task(task_id)

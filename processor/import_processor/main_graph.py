@@ -13,7 +13,7 @@ from processor.import_processor.state import ImportGraphState, get_default_state
 class KBImportWorkflow:
     """创建图"""
 
-    def __init__(self, config=None):
+    def __init__(self):
         # 编译好的图
         self._compiled_graph = None
 

@@ -1,6 +1,6 @@
 from langchain_core.output_parsers import StrOutputParser
 
-from processor.config_plus.milvus_config import milvus_config
+from processor.configs.milvus_config import milvus_config
 from processor.query_processor.BaseNode import BaseNode
 from processor.query_processor.prompt.search_embedding_hyde import HYDE_PROMPT
 from processor.query_processor.state import QueryGraphState
@@ -12,20 +12,18 @@ from utils.milvus_hybrid_search_util import create_hybrid_search_requests, hybri
 
 
 class NodeSearchEmbeddingHyde(BaseNode):
-    """
-        HyDE检索节点
-    """
+
     name: str = "node_search_embedding_hyde"
 
     def process(self, state: QueryGraphState) -> QueryGraphState:
         """
-
-        步骤：
-            1. 参数提取：state['rewritten_query']和state['item_names']
+        HyDE检索节点
+        内容：
+            1. 参数提取：state[rewritten_query]、state[item_names]
             2. 生成假设文档：调用LLM，基于用户问题生成一段假设性回答。
             3. 混合检索：
-               - 将“用户问题 + 假设文档”合并，生成BGE-M3稠密+稀疏向量。
-               - 在Milvus中执行混合检索（带item_names商品名过滤）。
+                将 "用户问题 + 假设文档"合并，BGE-M3生成稠密+稀疏向量。
+                在Milvus中执行混合检索（带item_names商品名过滤）。
             4. 结果封装：返回检索到的切片列表和生成的假设文档，更新会话状态。
 
         Args:
@@ -33,7 +31,7 @@ class NodeSearchEmbeddingHyde(BaseNode):
             state[item_names] - 提取的商品名
 
         Returns:
-            state[hyde_embedding_chunks] - 检索结果、
+            state[hyde_embedding_chunks] - 检索结果
             state[hyde_doc] - 假设文档的字典
 
         """
@@ -68,7 +66,7 @@ class NodeSearchEmbeddingHyde(BaseNode):
 
     def _step_1_create_hyde_doc(self, rewritten_query: str) -> str:
         """
-        利用大模型根据用户查询生成假设性文档
+        利用LLM根据用户查询生成假设性文档
 
         Args:
             rewritten_query: 用户改写后的查询语句

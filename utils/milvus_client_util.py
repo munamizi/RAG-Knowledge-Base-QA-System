@@ -3,7 +3,7 @@
 """
 from pymilvus import MilvusClient
 
-from processor.config_plus.milvus_config import milvus_config
+from processor.configs.milvus_config import milvus_config
 
 mvilvus_client = None
 

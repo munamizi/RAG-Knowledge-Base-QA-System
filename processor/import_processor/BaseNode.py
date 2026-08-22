@@ -1,8 +1,6 @@
-from processor.import_processor.config import get_config, ImportConfig
 from processor.import_processor.exceptions import ImportProcessError
 from processor.import_processor.state import ImportGraphState
 from abc import ABC, abstractmethod
-from typing import Optional
 
 from utils.logger import logger
 from utils.task_util import add_running_task, add_done_task
@@ -16,17 +14,6 @@ class BaseNode(ABC):
     """
 
     name: str = "base_node"  # 节点名称,子类覆盖
-
-
-
-    def __init__(self, config: Optional[ImportConfig] = None):
-        """
-        config   配置对象，默认使用全局配置
-        """
-        self.config = config or get_config()
-
-
-
 
     @abstractmethod
     def process(self, state: ImportGraphState) -> ImportGraphState:

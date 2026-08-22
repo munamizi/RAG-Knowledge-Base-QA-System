@@ -1,3 +1,5 @@
 # 忽视文件和目录
 .env
 .venv/
+__pycache__/
+*.py[cod]

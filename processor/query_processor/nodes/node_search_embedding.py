@@ -1,4 +1,4 @@
-from processor.config_plus.milvus_config import milvus_config
+from processor.configs.milvus_config import milvus_config
 from processor.query_processor.BaseNode import BaseNode
 from processor.query_processor.state import QueryGraphState
 from utils.embedding_util import generate_embeddings

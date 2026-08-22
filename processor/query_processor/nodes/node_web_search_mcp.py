@@ -3,19 +3,18 @@ import json
 
 from langchain_mcp_adapters.client import MultiServerMCPClient
 
-from processor.config_plus.bailian_mcp_config import mcp_config
+from processor.configs.bailian_mcp_config import mcp_config
 from processor.query_processor.BaseNode import BaseNode
 from processor.query_processor.state import QueryGraphState
 from utils.logger import logger
 
 
 class NodeWebSearchMcp(BaseNode):
-    """通过百炼 MCP 联网搜索补充外部资料。"""
 
     name: str = "node_web_search_mcp"
 
     def process(self, state: QueryGraphState) -> QueryGraphState:
-        """执行网络搜索节点。"""
+        """执行网络搜索节点（百炼 MCP）。"""
 
         query = (state.get("rewritten_query", "")).strip()
 
@@ -71,7 +70,7 @@ class NodeWebSearchMcp(BaseNode):
                 name="bailian_web_search",
                 arguments={
                     "query": query,
-                    "count": 5,
+                    "count": 3,
                 },
             )
 

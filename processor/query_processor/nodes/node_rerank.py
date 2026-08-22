@@ -2,7 +2,7 @@ from typing import List, Dict, Any
 
 from fastapi import FastAPI
 
-from processor.config_plus.topk_truncate import truncate_config
+from processor.configs.topk_truncate import truncate_config
 from processor.query_processor.BaseNode import BaseNode
 from processor.query_processor.state import QueryGraphState
 from utils.logger import logger
@@ -10,15 +10,14 @@ from utils.reranker_http_util import rerank_documents
 
 
 class NodeRerank(BaseNode):
-    """
-        节点功能：使用 Cross-Encoder 模型对多路召回结果做精排，并做动态TopK。
-    """
 
     name: str = "node_rerank"
 
     def process(self, state: QueryGraphState) -> QueryGraphState:
         """
-        流程:
+        使用 Cross-Encoder 模型对多路召回结果做精排，并做动态TopK
+
+        内容:
             1.合并多源文档为格式：
             2.Reranker精排
             3.动态TopK（断崖检测截断）

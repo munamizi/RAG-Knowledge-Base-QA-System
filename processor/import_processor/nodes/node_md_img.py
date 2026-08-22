@@ -10,8 +10,9 @@ from langchain_openai import ChatOpenAI
 from minio import Minio
 from minio.deleteobjects import DeleteObject
 
-from processor.config_plus.minio_config import minio_config
-from processor.config_plus.vlm_config import vlm_config
+from processor.configs.image_process_config import image_process_config
+from processor.configs.minio_config import minio_config
+from processor.configs.vlm_config import vlm_config
 
 
 from processor.import_processor.BaseNode import BaseNode
@@ -149,7 +150,7 @@ class NodeMDImg(BaseNode):
             file_ext = os.path.splitext(image_file)[1].lower()
 
             # 如果后缀不是config配置文件中支持的格式，则跳过不处理
-            if file_ext not in self.config.image_extensions:
+            if file_ext not in image_process_config.supported_extensions:
                 logger.warning(f"图片格式不支持，跳过：{image_file}")
                 continue
 
@@ -158,7 +159,11 @@ class NodeMDImg(BaseNode):
 
             # 查找该图片文件是否在md文件中出现：判断md_content是否出现："![描述](images/a.png)"
             #  如果出现，返回图片出现位置的部分上下文，方便后续VLM总结图片信息
-            context = self._find_image_in_md(md_content, image_file)
+            context = self._find_image_in_md(
+                md_content,
+                image_file,
+                context_len=image_process_config.context_length,
+            )
             #  如果没有出现，跳过当前图片文件不处理
             if not context:
                 logger.warning(f"图片未在 MD 中引用，跳过：{image_file}")
@@ -215,7 +220,11 @@ class NodeMDImg(BaseNode):
 
         for img_file, image_path, context in target_images:
             # 控制vlm模型请求速率
-            self._apply_api_rate_limit(request_deque, max_requests=30)
+            self._apply_api_rate_limit(
+                request_deque,
+                max_requests=image_process_config.request_limit,
+                window_seconds=image_process_config.request_window_seconds,
+            )
             # 调用vlm做图片文本总结
             summaries[img_file] = self._summarize_image(
                 image_path=image_path,

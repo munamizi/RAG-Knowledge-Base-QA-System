@@ -1,12 +1,11 @@
 from typing import Tuple, Dict, List
 
-from dotenv import load_dotenv
 from langchain_core.messages import SystemMessage, HumanMessage
 from langchain_core.output_parsers import JsonOutputParser
 from langchain_openai import ChatOpenAI
 
-from processor.config_plus.llm_config import llm_config
-from processor.config_plus.milvus_config import milvus_config
+from processor.configs.llm_config import llm_config
+from processor.configs.milvus_config import milvus_config
 from processor.query_processor.BaseNode import BaseNode
 from processor.query_processor.prompt.node_item_name_confirm import ITEM_NAME_EXTRACT_TEMPLATE, \
     ITEM_NAME_EXTRACT_SYSTEM_PROMPT
@@ -16,8 +15,6 @@ from utils.logger import logger
 from utils.milvus_client_util import get_milvus_client
 from utils.milvus_hybrid_search_util import create_hybrid_search_requests, hybrid_search
 from utils.mongo_history_utils import get_recent_messages, save_chat_message, update_message_item_names
-
-load_dotenv(override=True)
 
 class NodeItemNameConfirm(BaseNode):
     """

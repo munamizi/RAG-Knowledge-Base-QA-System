@@ -2,7 +2,7 @@ from typing import Tuple, List, Dict
 
 from pymilvus.model.hybrid import BGEM3EmbeddingFunction
 
-from processor.config_plus.embedding_config import embedding_config
+from processor.configs.embedding_config import embedding_config
 
 embedding_model = None
 

@@ -1,6 +1,6 @@
 from minio import Minio
 import json
-from processor.config_plus.minio_config import minio_config
+from processor.configs.minio_config import minio_config
 
 try:
     # 创建MinIO客户端

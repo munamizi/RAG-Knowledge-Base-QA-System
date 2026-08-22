@@ -1,6 +1,6 @@
 from langchain_openai import ChatOpenAI
 
-from processor.config_plus.llm_config import llm_config
+from processor.configs.llm_config import llm_config
 
 
 _llm_client_cache = {}

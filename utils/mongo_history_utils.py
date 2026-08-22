@@ -1,13 +1,11 @@
 import logging
-import os
 from datetime import datetime
 from typing import List, Dict, Any
 
 from bson import ObjectId
-from dotenv import load_dotenv
 from pymongo import MongoClient, ASCENDING, DESCENDING
 
-load_dotenv(override=True)
+from processor.configs.mongo_config import mongo_config
 
 class HistoryMongoTool:
     """
@@ -20,8 +18,8 @@ class HistoryMongoTool:
         """
         try:
 
-            self.mongo_url = os.getenv("MONGO_URL","")
-            self.db_name = os.getenv("MONGO_DB_NAME","")
+            self.mongo_url = mongo_config.mongo_url
+            self.db_name = mongo_config.db_name
 
             # 创建MongoDB客户端实例
             self.client = MongoClient(self.mongo_url)

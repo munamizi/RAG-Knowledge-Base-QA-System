@@ -1,3 +1,4 @@
+from processor.configs.embedding_config import embedding_config
 from processor.import_processor.BaseNode import BaseNode
 from processor.import_processor.exceptions import StateFieldError
 from processor.import_processor.state import ImportGraphState
@@ -97,7 +98,7 @@ class NodeBGEEmbedding(BaseNode):
         # 初始化结果列表[dict]
         output_data = []
         # 批次大小
-        batch_size = 32
+        batch_size = embedding_config.batch_size
 
         # 按批次遍历（本地BGE-M3防止爆内存）
         for i in range(0, len(chunks), batch_size):

@@ -4,7 +4,8 @@ from langchain_core.messages import SystemMessage, HumanMessage
 from langchain_openai import ChatOpenAI
 from pymilvus import DataType
 
-from processor.config_plus.milvus_config import milvus_config
+from processor.configs.item_recognition_config import item_recognition_config
+from processor.configs.milvus_config import milvus_config
 from processor.import_processor.BaseNode import BaseNode
 from processor.import_processor.exceptions import StateFieldError
 from processor.import_processor.state import ImportGraphState
@@ -107,7 +108,9 @@ class NodeItemNameRecognition(BaseNode):
 
         parts: List[str] = []
         total_chars = 0
-        for idx, chunk in enumerate(chunks[:self.config.item_name_chunk_k], start=1):
+        for idx, chunk in enumerate(
+            chunks[:item_recognition_config.chunk_count], start=1
+        ):
 
             # 1. 提取前k的切片，避免上下文过长
             chunk_title = chunk["title"].strip()
@@ -119,15 +122,18 @@ class NodeItemNameRecognition(BaseNode):
 
             # 3. 计算累计的字符数，判断是否要继续切分
             total_chars += len(piece)
-            if total_chars > self.config.item_name_chunk_size:
-                logger.warning(f"累计字符数{total_chars}已超过限制{self.config.item_name_chunk_size}，停止切分")
+            if total_chars > item_recognition_config.max_context_length:
+                logger.warning(
+                    f"累计字符数{total_chars}已超过限制"
+                    f"{item_recognition_config.max_context_length}，停止切分"
+                )
                 break
 
         # 4. 使用换行符对切分后的片段进行连接
         context = "\n\n".join(parts).strip()
 
         # 5. 对返回结果进行二次截断
-        final_context = context[:self.config.item_name_chunk_size]
+        final_context = context[:item_recognition_config.max_context_length]
 
         return final_context
 
@@ -165,10 +171,10 @@ class NodeItemNameRecognition(BaseNode):
 
             # LLM主体识别时
             model = ChatOpenAI(
-                model=self.config.item_model,
-                api_key=self.config.llm_api_key,
-                base_url=self.config.llm_base_url,
-                temperature=self.config.item_model_template,
+                model=item_recognition_config.model,
+                api_key=item_recognition_config.api_key,
+                base_url=item_recognition_config.base_url,
+                temperature=item_recognition_config.temperature,
                 extra_body={"enable_thinking": False}
             )
 

@@ -240,7 +240,7 @@
         .upload-icon{position:relative;width:60px;height:60px;margin:0 0 18px;display:grid;place-items:center;box-sizing:border-box;border:1px solid #e2c6bb;border-radius:18px;background:var(--accent-soft);color:var(--accent);box-shadow:none}.upload-icon::before,.upload-icon::after{content:none}.upload-icon svg{display:block;width:28px;height:28px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
         .upload-area p{width:100%;margin:0;color:#3f4540;font-size:14px;font-weight:650;line-height:1.65;text-align:center}.upload-help{display:block;margin-top:7px;color:#8a8e88;font-size:10px;font-weight:400}.format-row{display:flex;justify-content:center;gap:6px;margin-top:17px}.format-chip{padding:5px 8px;border:1px solid var(--line);border-radius:7px;background:#f5f4ef;color:#777c76;font:8px/1 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.08em}
         .file-list-wrap{margin-top:38px;padding-top:26px;border-top:1px solid var(--line)}.list-heading{display:flex;align-items:center;margin-bottom:13px}.list-heading h2{margin:0;color:#3c423d;font-size:12px;font-weight:650}.list-heading span{margin-left:8px;color:#92958f;font:9px/1 ui-monospace,SFMono-Regular,Consolas,monospace}.list-heading::after{content:"";height:1px;flex:1;margin-left:14px;background:var(--line)}
-        .file-list{margin:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.file-list:empty::before{content:"等待添加资料";grid-column:1/-1;padding:24px;border:1px dashed #d5d4cc;border-radius:13px;color:#a0a39e;text-align:center;font-size:10px}
+        .file-list{margin:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:10px}.file-list:empty::before{content:"等待添加资料";grid-column:1/-1;padding:24px;border:1px dashed #d5d4cc;border-radius:13px;color:#a0a39e;text-align:center;font-size:10px}
         .file-item{position:relative;margin:0;padding:15px 15px 14px;gap:12px;align-items:flex-start;border:1px solid var(--line);border-radius:14px;background:#fff;box-shadow:0 6px 18px rgba(35,41,37,.045)}.file-item::before{content:"";width:31px;height:36px;flex:0 0 31px;border:1px solid #d9d7cf;border-radius:7px;background:#f4f2ed;box-shadow:inset 0 -6px 0 #ece9e2}
         .file-info{min-width:0;margin:0}.file-name{display:block;max-width:calc(100% - 70px);overflow:hidden;color:#353b36;font-size:11px;font-weight:650;text-overflow:ellipsis;white-space:nowrap}.file-size{margin-top:5px;color:#959892;font:8px/1.3 ui-monospace,SFMono-Regular,Consolas,monospace}
         .status-badge{position:absolute;right:12px;top:12px;min-width:0;padding:5px 7px;border:0;border-radius:7px;background:#f1efea;color:#747872;font-size:8px;font-weight:650}.status-uploading{color:#8f6236;background:#f6ebdd}.status-processing{color:#a0523d;background:#f5e4dd}.status-completed{color:#4f7358;background:#e7f0e9}.status-error{color:#965047;background:#f4e4e2}
@@ -262,7 +262,6 @@
         @keyframes progressFlow{from{transform:translateX(-110%)}to{transform:translateX(280%)}}
         @keyframes countBump{0%{transform:scale(.82);opacity:.45}70%{transform:scale(1.12)}100%{transform:none;opacity:1}}
         @keyframes donePulse{0%{box-shadow:0 0 0 0 rgba(95,133,104,.18)}100%{box-shadow:0 0 0 8px rgba(95,133,104,0)}}
-        @keyframes detailReveal{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
         @keyframes stateBadgeIn{from{opacity:.45;transform:translateY(3px) scale(.96)}to{opacity:1;transform:none}}
         @keyframes stateSweep{0%{opacity:0;transform:translateX(-105%)}35%{opacity:.32}100%{opacity:0;transform:translateX(115%)}}
         @keyframes stateDotPulse{0%,100%{box-shadow:0 0 0 0 rgba(200,100,70,.08)}50%{box-shadow:0 0 0 4px rgba(200,100,70,.11)}}
@@ -289,15 +288,17 @@
         .file-item{overflow:hidden}.file-item::after{content:"";position:absolute;z-index:0;inset:0;width:42%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.58),transparent);opacity:0;transform:translateX(-105%);pointer-events:none}.file-item.is-state-changing::after{animation:stateSweep .58s var(--ease-silk)}
         .file-info,.status-badge{position:relative;z-index:1}.status-badge.is-changing{animation:stateBadgeIn .3s var(--ease-silk)}.file-item[data-state="completed"] .status-badge.is-changing{animation:stateBadgeIn .3s var(--ease-silk),donePulse .7s var(--ease-silk)}
         .file-item[data-state="uploading"] .status-badge::before,.file-item[data-state="processing"] .status-badge::before{animation:stateDotPulse 1.45s ease-in-out infinite}
-        .progress-bar{position:relative;overflow:hidden;transition:width 1.55s var(--ease-silk),background-color .3s ease}.progress-bar::after{content:"";position:absolute;inset:0;width:38%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.72),transparent);transform:translateX(-110%)}
-        .file-item[data-state="uploading"] .progress-bar::after,.file-item[data-state="processing"] .progress-bar::after{animation:progressFlow 1.55s ease-in-out infinite}
+        .progress-bar-container{opacity:1;transform:scaleY(1);transform-origin:center;transition:height .22s var(--ease-silk),margin-top .22s var(--ease-silk),opacity .18s var(--ease-silk),transform .22s var(--ease-silk)}
+        .progress-bar-container.is-complete{height:0;margin-top:0;opacity:0;transform:scaleY(.7)}
+        .progress-bar{position:relative;overflow:hidden;transition:width .28s var(--ease-silk),background-color .22s ease}.progress-bar::after{content:"";position:absolute;inset:0;width:38%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.72),transparent);transform:translateX(-110%)}
+        .file-item[data-state="uploading"] .progress-bar::after,.file-item[data-state="processing"] .progress-bar::after{animation:progressFlow 1.55s linear infinite}
         @keyframes logSummaryBlend{from{opacity:.45;transform:translateY(2px)}to{opacity:1;transform:none}}
-        .log-details{transition:border-color .22s ease,color .22s ease}.log-details[open] .log-list{animation:detailReveal .28s var(--ease-silk) backwards}.log-details summary.is-updating{animation:logSummaryBlend .28s var(--ease-silk)}
-        .log-list{position:relative;margin:8px 0 0;padding:1px 0;list-style:none}.log-list::before{content:"";position:absolute;left:3px;top:7px;bottom:7px;width:1px;background:rgba(82,91,84,.12)}.log-step{position:relative;display:grid;grid-template-columns:7px minmax(0,1fr);gap:8px;align-items:start;min-height:20px;padding:3px 0;color:#777c77;animation:logStepSettle .3s var(--ease-silk)}.log-step.is-transitioning{animation:logStepSettle .36s var(--ease-silk)}.log-node{position:relative;z-index:1;width:7px;height:7px;margin-top:3px;border:1px solid #c7cbc6;border-radius:50%;background:#f2f2ee;transition:border-color .28s ease,background-color .28s ease,box-shadow .28s ease}.log-step.is-running .log-node{border-color:rgba(200,100,70,.48);background:#f5e6e0;animation:stateDotPulse 1.45s ease-in-out infinite}.log-step.is-done .log-node{border-color:#9da79f;background:#9da79f}.log-step.is-done .log-node::after{content:"";position:absolute;left:2px;top:1px;width:2px;height:3px;border:solid #fff;border-width:0 1px 1px 0;transform:rotate(45deg)}.log-step.is-done .log-text{color:#8b908b}.log-step.is-empty .log-node{border-style:dashed;background:transparent}
+        .log-details{transition:border-color .22s ease,color .22s ease}.log-details-body{display:grid;grid-template-rows:0fr;opacity:0;transition:grid-template-rows .2s var(--ease-silk),opacity .16s var(--ease-silk)}.log-details-body-inner{min-height:0;overflow:hidden}.log-details[open] .log-details-body{grid-template-rows:1fr;opacity:1}.log-details summary.is-updating{animation:logSummaryBlend .28s var(--ease-silk)}
+        .log-list{position:relative;margin:8px 0 0;padding:1px 0;list-style:none}.log-step{position:relative;display:grid;grid-template-columns:7px minmax(0,1fr);gap:8px;align-items:start;min-height:20px;padding:3px 0;color:#777c77;animation:logStepSettle .3s var(--ease-silk)}.log-step:not(:last-child)::before{content:"";position:absolute;left:3px;top:10px;width:1px;height:100%;background:rgba(82,91,84,.12)}.log-step.is-transitioning{animation:logStepSettle .36s var(--ease-silk)}.log-node{position:relative;z-index:1;width:7px;height:7px;margin-top:3px;border:1px solid #c7cbc6;border-radius:50%;background:#f2f2ee;transition:border-color .28s ease,background-color .28s ease,box-shadow .28s ease}.log-step.is-running .log-node{border-color:rgba(200,100,70,.48);background:#f5e6e0;animation:stateDotPulse 1.45s ease-in-out infinite}.log-step.is-done .log-node{border-color:#9da79f;background:#9da79f}.log-step.is-done .log-node::after{content:"";position:absolute;left:2px;top:1px;width:2px;height:3px;border:solid #fff;border-width:0 1px 1px 0;transform:rotate(45deg)}.log-step.is-done .log-text{color:#8b908b}.log-step.is-empty .log-node{border-style:dashed;background:transparent}
         #taskCount.count-bump{display:inline-block;animation:countBump .38s var(--ease-snap) backwards}
         .page-foot{animation:riseIn .5s .56s var(--ease-silk) backwards}.page-leaving .shell{opacity:0;transform:translateY(4px) scale(.996);transition:opacity .16s ease,transform .16s ease}
         @media(prefers-reduced-motion:reduce){.shell,.site-brand,.site-mark,.site-nav,.eyebrow,.intro h1,.lead,.flow-list li,.upload-panel,.file-list-wrap,.file-item,.file-item[data-state="completed"] .status-badge,.log-details[open] .log-list,#taskCount.count-bump,.page-foot{animation:none!important}.site-nav a,.site-nav a svg,.flow-index,.upload-panel,.upload-area,.upload-icon,.upload-icon::after,.format-chip,.file-item,.file-item::before,.status-badge,.progress-bar,.log-details{transition:none!important}.upload-area.is-dragging .upload-icon,.file-item .progress-bar::after{animation:none!important}.site-nav a:hover,.site-nav a:hover svg,.flow-list li:hover .flow-index,.upload-panel:hover,.upload-area:hover .upload-icon,.upload-area:hover .upload-icon::after,.upload-area:hover .format-chip,.file-item:hover,.file-item:hover::before{transform:none!important}}
-        @media(prefers-reduced-motion:reduce){.file-item.is-state-changing::after,.status-badge.is-changing,.log-step,.log-step.is-running .log-node,.file-item[data-state="uploading"] .status-badge::before,.file-item[data-state="processing"] .status-badge::before{animation:none!important}.log-node{transition:none!important}}
+        @media(prefers-reduced-motion:reduce){.file-item.is-state-changing::after,.status-badge.is-changing,.log-step,.log-step.is-running .log-node,.file-item[data-state="uploading"] .status-badge::before,.file-item[data-state="processing"] .status-badge::before{animation:none!important}.log-node,.log-details-body{transition:none!important}.progress-bar-container.is-complete{transform:none}}
     </style>
     <style>
         /* Seamless navigation：顶部外壳保持稳定，内容区域自然接续 */
@@ -502,6 +503,39 @@
         return true;
     }
 
+    function completeProgressBar(bar) {
+        const container = bar.closest('.progress-bar-container');
+        if (!container) return;
+
+        let finished = false;
+        let fallbackTimer = 0;
+        const collapse = () => {
+            if (finished) return;
+            finished = true;
+            bar.removeEventListener('transitionend', handleWidthEnd);
+            window.clearTimeout(fallbackTimer);
+
+            const settleDelay = reduceMotionQuery.matches ? 0 : 90;
+            window.setTimeout(() => {
+                container.classList.add('is-complete');
+                const hideDelay = reduceMotionQuery.matches ? 0 : 220;
+                window.setTimeout(() => {
+                    if (container.classList.contains('is-complete')) {
+                        container.style.display = 'none';
+                    }
+                }, hideDelay);
+            }, settleDelay);
+        };
+        const handleWidthEnd = (event) => {
+            if (event.propertyName === 'width') collapse();
+        };
+
+        bar.addEventListener('transitionend', handleWidthEnd);
+        const changed = updateProgressBar(bar, 100);
+        fallbackTimer = window.setTimeout(collapse, reduceMotionQuery.matches ? 30 : 420);
+        if (!changed) collapse();
+    }
+
     function setItemState(itemEl, statusBadge, state, label, badgeClass) {
         const changed = itemEl.dataset.state !== state;
         const contentChanged = statusBadge.textContent !== label || !statusBadge.classList.contains(badgeClass);
@@ -534,7 +568,11 @@
                     </div>
                     <details class="log-details">
                         <summary>日志（点击展开）</summary>
-                        <ul class="log-list"></ul>
+                        <div class="log-details-body">
+                            <div class="log-details-body-inner">
+                                <ul class="log-list"></ul>
+                            </div>
+                        </div>
                     </details>
                 </div>
                 <div class="status-badge status-uploading" role="status">上传中...</div>
@@ -556,6 +594,7 @@
 
         try {
             // 1. 上传文件
+            progressContainer.classList.remove('is-complete');
             progressContainer.style.display = 'block';
             // 模拟上传进度
             updateProgressBar(progressBar, 24);
@@ -696,7 +735,7 @@
 
                 if (data.status === 'completed') {
                     setItemState(itemEl, statusBadge, 'completed', '已完成', 'status-completed');
-                    updateProgressBar(progressBar, 100);
+                    completeProgressBar(progressBar);
                     stopped = true;
                 } else if (data.status === 'processing') {
                     // 保持处理中状态

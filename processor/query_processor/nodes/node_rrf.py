@@ -5,22 +5,19 @@ from processor.query_processor.state import QueryGraphState
 
 
 class NodeRrf(BaseNode):
-    """
-        将二路召回的结果（向量、HyDE）进行RRF融合排序
-    """
 
-    # 覆盖基类的 name 属性，标识节点名称
     name: str = "node_rrf"
 
     def process(self, state: QueryGraphState) -> QueryGraphState:
         """
+        将二路召回的结果（向量、HyDE）进行RRF融合排序
 
         Args:
-            state['embedding_chunks']、
-            state['hyde_embedding_chunks']
+            state[embedding_chunks]
+            state[hyde_embedding_chunks]
 
         Returns:
-            state['rrf_chunks'] : list[Dict]
+            state[rrf_chunks] : list[Dict]
                 [
                     {
                         'chunk_id':值

@@ -308,6 +308,15 @@ class NodeAnswerOutput(BaseNode):
                 matches = md_img_pattern.findall(text)
                 for img_url in matches:
                     img_url = img_url.strip()
+
+                    if not img_url.lower().startswith(("http://", "https://")):
+                        logger.warning(f"跳过非远程图片地址：{img_url}")
+                        continue
+
+                    if img_url not in seen:
+                        seen.add(img_url)
+                        images.append(img_url)
+
                     if img_url and img_url not in seen:
                         logger.debug(f"文档[{i}] 正文发现 Markdown 图片: {img_url}")
                         seen.add(img_url)

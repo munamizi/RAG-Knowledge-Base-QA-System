@@ -4,7 +4,7 @@ import zipfile
 from pathlib import Path
 import requests
 
-from processor.config_plus.mineru_config import mineru_config
+from processor.configs.mineru_config import mineru_config
 from processor.import_processor.BaseNode import BaseNode
 from processor.import_processor.exceptions import (
     StateFieldError,

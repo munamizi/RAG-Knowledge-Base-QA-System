@@ -1,9 +1,6 @@
 import dashscope
-from dotenv import load_dotenv
 
-from processor.config_plus.reranker_config import reranker_config
-
-load_dotenv()
+from processor.configs.reranker_config import reranker_config
 
 def rerank_documents(query: str, documents: list[str]) -> list[float]:
 

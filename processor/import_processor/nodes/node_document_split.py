@@ -3,14 +3,10 @@ import json
 from pathlib import Path
 from typing import Tuple, List, Dict
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+from processor.configs.document_split_config import document_split_config
 from processor.import_processor.BaseNode import BaseNode
 from processor.import_processor.state import ImportGraphState
 from utils.logger import logger
-
-# 长切阈值
-DEFAULT_MAX_CONTENT_LENGTH = 2000
-# 短合阈值
-MIN_CONTENT_LENGTH = 500
 
 class NodeDocumentSplit(BaseNode):
 
@@ -258,7 +254,7 @@ class NodeDocumentSplit(BaseNode):
 
         content = section.get("content", "")
 
-        if len(content) <= DEFAULT_MAX_CONTENT_LENGTH:
+        if len(content) <= document_split_config.max_content_length:
             return [section]
 
         title = section.get("title", "")
@@ -266,7 +262,7 @@ class NodeDocumentSplit(BaseNode):
         prefix = f"{title}\n\n" if title else ""
 
         # 减去前缀长度,正文部分最多能有多少字
-        available_len = DEFAULT_MAX_CONTENT_LENGTH - len(prefix)
+        available_len = document_split_config.max_content_length - len(prefix)
         if available_len <= 0:
             logger.warning(f"标题太长无法切分:{title[:20]}...")
             return [section]
@@ -303,7 +299,7 @@ class NodeDocumentSplit(BaseNode):
         """
         把太短的相邻 sections 合并。
         合并必须同时满足条件:
-          1. 当前块长度小于 MIN_CONTENT_LENGTH
+          1. 当前块长度小于配置的最小长度
           2. 当前块和下一块属于同一个父标题(parent_title相同)
 
         Args:
@@ -324,7 +320,10 @@ class NodeDocumentSplit(BaseNode):
                 continue
 
             # 判断要不要合并
-            is_current_short = len(current_chunk["content"]) < MIN_CONTENT_LENGTH
+            is_current_short = (
+                len(current_chunk["content"])
+                < document_split_config.min_content_length
+            )
             is_same_parent = current_chunk.get("parent_title") == sec.get("parent_title")
 
             if is_current_short and is_same_parent:

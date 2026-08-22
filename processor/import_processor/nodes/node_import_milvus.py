@@ -2,7 +2,7 @@ from typing import Dict, Any, List
 
 from pymilvus import DataType
 
-from processor.config_plus.milvus_config import milvus_config
+from processor.configs.milvus_config import milvus_config
 from processor.import_processor.BaseNode import BaseNode
 from processor.import_processor.exceptions import StateFieldError, MilvusError
 from processor.import_processor.state import ImportGraphState
@@ -12,44 +12,36 @@ from utils.milvus_client_util import get_milvus_client
 
 
 class NodeImportMilvus(BaseNode):
-    """
-    导入向量库节点：数据持久化
-    """
-
 
     name: str = "node_import_milvus"
 
     def process(self, state: ImportGraphState) -> ImportGraphState:
         """
-        Milvus切片数据入库
-        流程：
-            1. 输入校验：验证切片有效性、向量字段完整性，提取向量维度
-            2. 环境准备：连接Milvus，集合不存在则自动创建Schema+索引
-            3. 幂等清理：删除同file_title旧数据，避免重复存储
-            4. 批量插入：预处理数据后批量入库，回填Milvus自增chunk_id
-            5. 状态更新：将回填了chunk_id的切片更新回全局状态，供下游使用
+        chunks存入milvus的kb_chunks集合
 
-        异常处理：
-            任一步骤失败抛出异常，终止节点执行，保证数据不脏写
+        内容：
+            1. 输入校验，返回稠密向量维度(方便后续创建集合)
+            2. 创建milvus集合kb_chunks，保证幂等性
+            3. 批量插入：chunck批量入库，回填Milvus自增chunk_id到state[chunks]
 
-        必要参数：chunks
-        更新参数：chunks字段回填chunk_id
+        Args:
+            chunks[state]
+
+        Returns:
+            chunks字段回填chunk_id
 
         """
 
-        # 步骤1：chunks有效性校验
+        # chunks有效性校验，返回校验后chunks和稠密向量维度
         checked_chunks, vector_dimension = self._step_1_check_input(state)
 
-        # 步骤2：获取milvus客户端、创建集合
+        # 获取milvus客户端、创建集合kb_chuncks
         client = self._step_2_prepare_collection(vector_dimension)
-
-        # 步骤3：幂等性处理（清理file_title同名旧数据）
+        # 幂等性处理（清理file_title同名旧数据）
         self._step_3_clean_old_data(client, checked_chunks)
 
-        # 步骤4：批量插入数据+主键chunk_id回填
+        # 批量插入数据，主键chunk_id回填; 更新state[chunks]
         updated_chunks = self._step_4_insert_data(client, checked_chunks)
-
-        # 步骤5：更新全局状态，将回填后的切片回传下游
         state["chunks"] = updated_chunks
 
         return state
@@ -58,7 +50,8 @@ class NodeImportMilvus(BaseNode):
 
     def _step_1_check_input(self, state: Dict[str, Any]) -> tuple[List[Dict[str, Any]], int]:
         """
-        步骤1: chunks有效性校验
+         chunks有效性校验
+
         内容：
             1. 校验chunks非空且类型正确[dict]
             2. 校验chunks包含dense_vector和sparse_vector字段
@@ -66,58 +59,52 @@ class NodeImportMilvus(BaseNode):
 
         Args:
             state[chunks]
+
         Returns:
-            tuple(校验通过的切片列表, 稠密向量维度)
-        Raise:
-            任一校验项不通过，抛出ValueError终止入库流程，避免脏数据处理
+            (chunks, 稠密向量维度)
 
         """
 
-        # 校验1：chunks非空
+        # 校验chunks非空
         chunks = state.get("chunks")
-
         if not isinstance(chunks, list):
             raise StateFieldError(field_name="chunks", message="chunks数据类型不正确", expected_type=list)
-
         if not chunks:
             raise StateFieldError(field_name="chunks", message="chunks不能为空", expected_type=list)
 
-
-        # 校验2：切片包含dense_vector字段
+        # 校验切片包含dense_vector字段, 校验切片包含 sparse_vector 字段
         first_chunk = chunks[0]
         if 'dense_vector' not in first_chunk:
             raise StateFieldError(field_name="chunks", message="错误: 数据中缺失dense_vector字段")
-
-        # 校验3：切片包含 sparse_vector 字段
         if 'sparse_vector' not in first_chunk:
             raise StateFieldError(field_name="chunks", message="错误: 数据中缺失sparse_vector字段")
 
-
         # 提取向量维度
         vector_dimension = len(first_chunk['dense_vector'])
+
         return chunks, vector_dimension
 
 
 
     def _step_2_prepare_collection(self, vector_dimension: int):
         """
-        步骤2: 创建向量库集合
+        创建向量库集合
 
         Args：
-            vector_dimension: int - 稠密向量维度（步骤1提取）
+            vector_dimension - 稠密向量维度
         Reutrns：
-            MilvusClient - 已连接、集合准备完成的客户端实例
+            MilvusClient - 已连接、集合准备完成的milvus客户端实例
         Raise：
             客户端获取失败/集合名称未配置，抛出异常终止流程
         """
 
-        # 1. 获取milvus客户端对象
+        # 获取milvus客户端实例
         milvus_client = get_milvus_client()
         if not milvus_client:
             logger.error("Milvus 连接失败")
             raise MilvusError("Milvus 连接失败")
 
-        # 2. 集合不存在则创建
+        # 集合不存在则创建，有则复用
         collections_name = milvus_config.chunks_collection
         if not milvus_client.has_collection(collections_name):
             self._create_chunks_collection(collections_name, milvus_client, vector_dimension)
@@ -126,16 +113,16 @@ class NodeImportMilvus(BaseNode):
 
     def _create_chunks_collection(self, collections_name, milvus_client, vector_dimension):
 
-        # 1. 配置schema和索引
+        # 配置schema和向量索引
         schema = (
-            milvus_client.create_schema(auto_id=True, enable_dynamic_field=True)
-            .add_field(field_name="chunk_id", datatype=DataType.INT64, is_primary=True, auto_id=True)
+            milvus_client.create_schema(auto_id=True, enable_dynamic_field=True)   # 允许添加schema外的额外字段
+            .add_field(field_name="chunk_id", datatype=DataType.INT64, is_primary=True, auto_id=True)   # 主键pk，且自动生成
             .add_field(field_name="content", datatype=DataType.VARCHAR, max_length=65535)               # 切片内容
-            .add_field(field_name="title", datatype=DataType.VARCHAR, max_length=100)                   # 切片标题
-            .add_field(field_name="parent_title", datatype=DataType.VARCHAR, max_length=100)            # 父标题
-            .add_field(field_name="part", datatype=DataType.INT8)                                       # 分片编号
-            .add_field(field_name="file_title", datatype=DataType.VARCHAR, max_length=100)              # 源文件标题
-            .add_field(field_name="item_name", datatype=DataType.VARCHAR, max_length=100)               # 商品名称（幂等性依据）
+            .add_field(field_name="title", datatype=DataType.VARCHAR, max_length=512)                   # 切片标题
+            .add_field(field_name="parent_title", datatype=DataType.VARCHAR, max_length=512)            # 切片父标题
+            .add_field(field_name="part", datatype=DataType.INT8)                                       # 分片父标题编号
+            .add_field(field_name="file_title", datatype=DataType.VARCHAR, max_length=512)              # 导入资料名
+            .add_field(field_name="item_name", datatype=DataType.VARCHAR, max_length=512)               # 商品名称(幂等清理依据)
             .add_field(field_name="sparse_vector", datatype=DataType.SPARSE_FLOAT_VECTOR)               # 稀疏向量
             .add_field(field_name="dense_vector", datatype=DataType.FLOAT_VECTOR, dim=vector_dimension) # 稠密向量
         )
@@ -146,7 +133,7 @@ class NodeImportMilvus(BaseNode):
             field_name="dense_vector",
             index_name="dense_vector_index",
             index_type="AUTOINDEX",  # 自动匹配最优索引类型
-            metric_type="COSINE"  # 余弦相似度
+            metric_type="COSINE"     # 余弦相似度
         )
         index_params.add_index(
             field_name="sparse_vector",
@@ -157,7 +144,7 @@ class NodeImportMilvus(BaseNode):
         )
 
 
-        # 2. 创建集合
+        # 创建集合
         milvus_client.create_collection(
             collection_name=collections_name,
             schema=schema,
@@ -169,11 +156,11 @@ class NodeImportMilvus(BaseNode):
     def _step_3_clean_old_data(self, client, checked_chunks):
 
         """
-        幂等清理集合中与fifle_title同名的旧数据
+        清理集合中与fifle_title同名的旧数据
 
         Args:
-            client: milvus客户端
-            checked_chunks: 检验后的chunks
+            client - milvus客户端
+            chunks - 检验后的chunks
 
         """
 
@@ -195,32 +182,48 @@ class NodeImportMilvus(BaseNode):
             raise MilvusError(f"Milvus 数据删除失败: {str(e)}")
 
 
-    def _step_4_insert_data(self, client, chunks_json_data):
+
+    def _step_4_insert_data(self, client, checked_chunks):
         """
-        步骤4：批量插入切片数据到Milvus+主键回填
-        核心逻辑：
+        批量插入切片数据到Milvus+主键回填
+        内容:
             1. 批量插入数据
-            2. 回填chunk_id：将Milvus生成的自增主键回填到切片，供下游业务使用
-        Args：
-            client - MilvusClient实例
-            chunks_json_data: List[Dict[str, Any]] - 待入库的切片列表
-        Returns：
-            List[Dict[str, Any]] - 回填了chunk_id的切片列表
+            2. 回填chunk_id：将Milvus生成的自增主键回填到state[chunks]
+
+        Args:
+            client - milvus客户端实例
+            checked_chunks - 校验后的chunks
+
+        Returns:
+            state[chunks] - 回填chunks_id字段的chunks
+            {
+                "title": "注意事项-1",
+                "parent_title": "注意事项"
+                "part":"1"
+                "content": "正文内容",
+                "file_title": "hak180产品安全手册",
+
+                "dense_vector"：content稠密向量,
+                "sparse_vector"：content稀疏向量
+
+                "chunk_id":主键
+            }
         """
+
         # 1. 填充part字段
-        for item in chunks_json_data:
-            item["part"] = 0
+        for item in  checked_chunks:
+            if item.get("part") is None:
+                item["part"] = 0
 
         # 2. 批量插入数据
         result = client.insert(
             collection_name=milvus_config.chunks_collection,
-            data=chunks_json_data
+            data= checked_chunks
         )
 
         # 3. 回填chunk_id
         inserted_ids = result.get("ids")
-        for idx, item in enumerate(chunks_json_data):
+        for idx, item in enumerate(checked_chunks):
             item["chunk_id"] = inserted_ids[idx]
 
-        return chunks_json_data
-
+        return checked_chunks
