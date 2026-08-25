@@ -1,18 +1,12 @@
-import os
-from dataclasses import dataclass
+from pydantic import Field
 
-from dotenv import load_dotenv
+from processor.configs.base import AppBaseSettings
 
-load_dotenv(override=True)
 
-@dataclass
-class VLMConfig:
-    base_url:str
-    api_key:str
-    vl_model:str
+class VLMConfig(AppBaseSettings):
+    base_url: str = Field(min_length=1, validation_alias="VLM_BASE_URL")
+    api_key: str = Field(min_length=1, repr=False, validation_alias="VLM_API_KEY")
+    vl_model: str = Field(min_length=1, validation_alias="VL_MODEL")
 
-vlm_config = VLMConfig(
-    base_url=os.getenv("VLM_BASE_URL"),
-    api_key=os.getenv("VLM_API_KEY"),
-    vl_model=os.getenv("VL_MODEL")
-    )
+
+vlm_config = VLMConfig()

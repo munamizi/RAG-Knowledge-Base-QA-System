@@ -1,27 +1,24 @@
-import os
-from dataclasses import dataclass
+from pydantic import Field
 
-from dotenv import load_dotenv
-
-
-load_dotenv()
+from processor.configs.base import AppBaseSettings
 
 
-@dataclass
-class ItemRecognitionConfig:
-    chunk_count: int
-    max_context_length: int
-    model: str
-    temperature: float
-    api_key: str
-    base_url: str
+class ItemRecognitionConfig(AppBaseSettings):
+    chunk_count: int = Field(default=3, gt=0, validation_alias="IMPORT_ITEM_NAME_CHUNK_K")
+    max_context_length: int = Field(
+        default=2500,
+        gt=0,
+        validation_alias="IMPORT_ITEM_NAME_CHUNK_SIZE",
+    )
+    model: str = Field(min_length=1, validation_alias="ITEM_MODEL")
+    temperature: float = Field(
+        default=0.1,
+        ge=0,
+        le=2,
+        validation_alias="ITEM_MODEL_TEMPERATURE",
+    )
+    api_key: str = Field(min_length=1, repr=False, validation_alias="API_KEY")
+    base_url: str = Field(min_length=1, validation_alias="BASE_URL")
 
 
-item_recognition_config = ItemRecognitionConfig(
-    chunk_count=int(os.getenv("IMPORT_ITEM_NAME_CHUNK_K", "3")),
-    max_context_length=int(os.getenv("IMPORT_ITEM_NAME_CHUNK_SIZE", "2500")),
-    model=os.getenv("ITEM_MODEL", ""),
-    temperature=float(os.getenv("ITEM_MODEL_TEMPERATURE", "0.1")),
-    api_key=os.getenv("API_KEY", ""),
-    base_url=os.getenv("BASE_URL", ""),
-)
+item_recognition_config = ItemRecognitionConfig()

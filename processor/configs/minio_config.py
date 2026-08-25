@@ -1,22 +1,14 @@
-import os
-from dataclasses import dataclass
+from pydantic import Field
 
-from dotenv import load_dotenv
+from processor.configs.base import AppBaseSettings
 
-load_dotenv(override=True)
 
-@dataclass
-class MinIOConfig:
-    endpoint: str
-    access_key: str
-    secret_key: str
-    bucket_name: str
-    img_dir: str
+class MinIOConfig(AppBaseSettings):
+    endpoint: str = Field(min_length=1, validation_alias="MINIO_ENDPOINT")
+    access_key: str = Field(min_length=1, repr=False, validation_alias="MINIO_ACCESS_KEY")
+    secret_key: str = Field(min_length=1, repr=False, validation_alias="MINIO_SECRET_KEY")
+    bucket_name: str = Field(min_length=1, validation_alias="MINIO_BUCKET_NAME")
+    img_dir: str = Field(min_length=1, validation_alias="MINIO_IMG_DIR")
 
-minio_config = MinIOConfig(
-    endpoint=os.getenv("MINIO_ENDPOINT"),
-    access_key=os.getenv("MINIO_ACCESS_KEY"),
-    secret_key=os.getenv("MINIO_SECRET_KEY"),
-    bucket_name=os.getenv("MINIO_BUCKET_NAME"),
-    img_dir=os.getenv("MINIO_IMG_DIR"),
-)
+
+minio_config = MinIOConfig()

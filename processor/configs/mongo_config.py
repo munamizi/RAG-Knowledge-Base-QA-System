@@ -1,19 +1,11 @@
-import os
-from dataclasses import dataclass
+from pydantic import Field
 
-from dotenv import load_dotenv
-
-
-load_dotenv(override=True)
+from processor.configs.base import AppBaseSettings
 
 
-@dataclass
-class MongoConfig:
-    mongo_url: str
-    db_name: str
+class MongoConfig(AppBaseSettings):
+    mongo_url: str = Field(min_length=1, validation_alias="MONGO_URL")
+    db_name: str = Field(min_length=1, validation_alias="MONGO_DB_NAME")
 
 
-mongo_config = MongoConfig(
-    mongo_url=os.getenv("MONGO_URL", ""),
-    db_name=os.getenv("MONGO_DB_NAME", ""),
-)
+mongo_config = MongoConfig()

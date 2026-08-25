@@ -1,18 +1,11 @@
-import os
-from dataclasses import dataclass
+from pydantic import Field
 
-from dotenv import load_dotenv
-
-load_dotenv()
+from processor.configs.base import AppBaseSettings
 
 
-# 定义mcp的服务配置
-@dataclass
-class McpConfig:
-    mcp_base_url: str
-    api_key : str
+class McpConfig(AppBaseSettings):
+    mcp_base_url: str = Field(min_length=1, validation_alias="MCP_DASHSCOPE_BASE_URL")
+    api_key: str = Field(min_length=1, repr=False, validation_alias="API_KEY")
 
-mcp_config = McpConfig(
-    mcp_base_url=os.getenv("MCP_DASHSCOPE_BASE_URL"),
-    api_key=os.getenv("API_KEY")
-)
+
+mcp_config = McpConfig()

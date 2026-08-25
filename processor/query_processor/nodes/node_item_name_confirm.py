@@ -18,7 +18,7 @@ from utils.mongo_history_utils import get_recent_messages, save_chat_message, up
 
 class NodeItemNameConfirm(BaseNode):
     """
-        主体识别 + 指代消除
+        主体识别 + 指代消除、混合检索、评分对齐、条件分支
     """
 
 

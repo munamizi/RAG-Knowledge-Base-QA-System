@@ -1,19 +1,12 @@
-import os
-from dataclasses import dataclass
+from pydantic import Field
 
-from dotenv import load_dotenv
-
-load_dotenv(override=True)
-
-@dataclass
-class RerankerConfig:
-    text_rerank_api_key: str # DashScope API Key
-    text_rerank_model: str # 模型名称
-    text_rerank_instruct: str # 是否使用指令
+from processor.configs.base import AppBaseSettings
 
 
-reranker_config = RerankerConfig(
-    text_rerank_api_key=os.getenv("API_KEY"),
-    text_rerank_model=os.getenv("TEXT_RERANK_MODEL"),
-    text_rerank_instruct=os.getenv("TEXT_RERANK_INSTRUCT")
-)
+class RerankerConfig(AppBaseSettings):
+    text_rerank_api_key: str = Field(min_length=1, repr=False, validation_alias="API_KEY")
+    text_rerank_model: str = Field(min_length=1, validation_alias="TEXT_RERANK_MODEL")
+    text_rerank_instruct: str = Field(default="", validation_alias="TEXT_RERANK_INSTRUCT")
+
+
+reranker_config = RerankerConfig()

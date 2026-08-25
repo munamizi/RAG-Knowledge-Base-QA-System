@@ -180,8 +180,8 @@ class NodeRerank(BaseNode):
         if not ranked_docs:
             return []
 
-        upper_bound = min(truncate_config.RERANK_MAX_TOPK, len(ranked_docs))
-        lower_bound = min(truncate_config.RERANK_MIN_TOPK, upper_bound)
+        upper_bound = min(truncate_config.rerank_max_topk, len(ranked_docs))
+        lower_bound = min(truncate_config.rerank_min_topk, upper_bound)
 
         # 默认值：取满硬上限（最多10条）
         cutoff_pos = upper_bound
@@ -197,7 +197,7 @@ class NodeRerank(BaseNode):
             # 计算相对差值
             rel_gap = abs_gap / (abs(current_score) + 1e-6)
             # 断崖检测
-            if abs_gap >= truncate_config.RERANK_GAP_ABS or rel_gap >= truncate_config.RERANK_GAP_RATIO:
+            if abs_gap >= truncate_config.rerank_gap_abs or rel_gap >= truncate_config.rerank_gap_ratio:
                 # 最终取前i+1条（索引转实际数量，如i=2 → 取前3条）
                 cutoff_pos = idx + 1
                 logger.debug(f"断崖检测: 位置 {idx + 1}, abs_gap={abs_gap:.4f}, rel_gap={rel_gap:.4f}")

@@ -1,20 +1,18 @@
-import os
-from dataclasses import dataclass
+from pydantic import Field
 
-from dotenv import load_dotenv
+from processor.configs.base import AppBaseSettings
 
-load_dotenv(override=True)
 
-@dataclass
-class LLMConfig:
-    model:str
-    base_url:str
-    api_key:str
-    llm_temperature:str
-
-llm_config = LLMConfig(
-    model=os.getenv("LLM_DEFAULT_MODEL"),
-    base_url=os.getenv("BASE_URL"),
-    api_key=os.getenv("API_KEY"),
-    llm_temperature=os.getenv("LLM_TEMPERATURE")
+class LLMConfig(AppBaseSettings):
+    model: str = Field(min_length=1, validation_alias="LLM_DEFAULT_MODEL")
+    base_url: str = Field(min_length=1, validation_alias="BASE_URL")
+    api_key: str = Field(min_length=1, repr=False, validation_alias="API_KEY")
+    llm_temperature: float = Field(
+        default=0.1,
+        ge=0,
+        le=2,
+        validation_alias="LLM_TEMPERATURE",
     )
+
+
+llm_config = LLMConfig()

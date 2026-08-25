@@ -1,19 +1,27 @@
-import os
-from dataclasses import dataclass
+from typing import Self
 
-from dotenv import load_dotenv
+from pydantic import Field, model_validator
 
-
-load_dotenv()
+from processor.configs.base import AppBaseSettings
 
 
-@dataclass
-class DocumentSplitConfig:
-    max_content_length: int
-    min_content_length: int
+class DocumentSplitConfig(AppBaseSettings):
+    max_content_length: int = Field(
+        default=2500,
+        gt=0,
+        validation_alias="IMPORT_MAX_CONTENT_LENGTH",
+    )
+    min_content_length: int = Field(
+        default=500,
+        gt=0,
+        validation_alias="IMPORT_MIN_CONTENT_LENGTH",
+    )
+
+    @model_validator(mode="after")
+    def validate_length_range(self) -> Self:
+        if self.min_content_length > self.max_content_length:
+            raise ValueError("IMPORT_MIN_CONTENT_LENGTH 不能大于 IMPORT_MAX_CONTENT_LENGTH")
+        return self
 
 
-document_split_config = DocumentSplitConfig(
-    max_content_length=int(os.getenv("IMPORT_MAX_CONTENT_LENGTH", "2500")),
-    min_content_length=int(os.getenv("IMPORT_MIN_CONTENT_LENGTH", "500")),
-)
+document_split_config = DocumentSplitConfig()

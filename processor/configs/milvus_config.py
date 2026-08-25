@@ -1,19 +1,12 @@
-import os
-from dataclasses import dataclass
+from pydantic import Field
 
-from dotenv import load_dotenv
+from processor.configs.base import AppBaseSettings
 
-load_dotenv()
 
-@dataclass
-class MilvusConfig:
-    milvus_url: str
-    chunks_collection: str
-    item_name_collection: str
+class MilvusConfig(AppBaseSettings):
+    milvus_url: str = Field(min_length=1, validation_alias="MILVUS_URL")
+    chunks_collection: str = Field(min_length=1, validation_alias="CHUNKS_COLLECTION")
+    item_name_collection: str = Field(min_length=1, validation_alias="ITEM_NAME_COLLECTION")
 
-# 实例化Milvus配置对象
-milvus_config = MilvusConfig(
-    milvus_url=os.getenv("MILVUS_URL"),
-    chunks_collection=os.getenv("CHUNKS_COLLECTION"),
-    item_name_collection=os.getenv("ITEM_NAME_COLLECTION")
-)
+
+milvus_config = MilvusConfig()

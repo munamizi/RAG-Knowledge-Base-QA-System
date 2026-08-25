@@ -1,15 +1,11 @@
-import os
-from dataclasses import dataclass
-from dotenv import load_dotenv
+from pydantic import Field
 
-load_dotenv(override=True)
+from processor.configs.base import AppBaseSettings
 
-@dataclass
-class MineruConfig:
-    base_url:str
-    api_token:str
 
-mineru_config = MineruConfig(
-    base_url=os.getenv("MINERU_BASE_URL"),
-    api_token=os.getenv("MINERU_API_TOKEN")
-    )
+class MineruConfig(AppBaseSettings):
+    base_url: str = Field(min_length=1, validation_alias="MINERU_BASE_URL")
+    api_token: str = Field(min_length=1, repr=False, validation_alias="MINERU_API_TOKEN")
+
+
+mineru_config = MineruConfig()

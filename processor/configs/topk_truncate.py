@@ -1,21 +1,21 @@
-import os
-from dataclasses import dataclass
+from typing import Self
 
-from dotenv import load_dotenv
+from pydantic import Field, model_validator
 
-load_dotenv(override=True)
-
-@dataclass
-class TruncateConfig:
-    RERANK_MAX_TOPK: int     # 动态 TopK 硬上限
-    RERANK_MIN_TOPK: int     # 最小 TopK：至少保留前 N 条
-    RERANK_GAP_ABS: float    # 断崖阈值（绝对差值）
-    RERANK_GAP_RATIO: float  # 断崖阈值（相对差值）
+from processor.configs.base import AppBaseSettings
 
 
-truncate_config = TruncateConfig(
-    RERANK_MAX_TOPK = int(os.getenv("RERANK_MAX_TOPK")),
-    RERANK_MIN_TOPK = int(os.getenv("RERANK_MIN_TOPK")),
-    RERANK_GAP_ABS = float(os.getenv("RERANK_GAP_ABS")),
-    RERANK_GAP_RATIO = float(os.getenv("RERANK_GAP_RATIO")),
-)
+class TruncateConfig(AppBaseSettings):
+    rerank_max_topk: int = Field(gt=0, validation_alias="RERANK_MAX_TOPK")
+    rerank_min_topk: int = Field(gt=0, validation_alias="RERANK_MIN_TOPK")
+    rerank_gap_abs: float = Field(ge=0, validation_alias="RERANK_GAP_ABS")
+    rerank_gap_ratio: float = Field(ge=0, validation_alias="RERANK_GAP_RATIO")
+
+    @model_validator(mode="after")
+    def validate_topk_range(self) -> Self:
+        if self.rerank_min_topk > self.rerank_max_topk:
+            raise ValueError("RERANK_MIN_TOPK 不能大于 RERANK_MAX_TOPK")
+        return self
+
+
+truncate_config = TruncateConfig()

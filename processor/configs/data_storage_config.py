@@ -1,17 +1,10 @@
-import os
-from dataclasses import dataclass
+from pydantic import Field
 
-from dotenv import load_dotenv
-
-
-load_dotenv()
+from processor.configs.base import AppBaseSettings
 
 
-@dataclass
-class DataStorageConfig:
-    data_based_root_dir: str
+class DataStorageConfig(AppBaseSettings):
+    data_based_root_dir: str = Field(min_length=1, validation_alias="DATA_BASED_ROOT_DIR")
 
 
-data_storage_config = DataStorageConfig(
-    data_based_root_dir=os.getenv("DATA_BASED_ROOT_DIR"),
-)
+data_storage_config = DataStorageConfig()
