@@ -162,6 +162,7 @@ def get_recent_messages(session_id: str, limit: int = 10) -> List[Dict[str, Any]
     """
     查询指定会话的最近N条对话记录，返回原始字典格式
     结果按时间正序排列，可直接喂给LLM作为上下文
+
     Args:
         session_id: 会话唯一标识，用于筛选指定会话的记录
         limit: 限制条数，默认返回最近10条

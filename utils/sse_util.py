@@ -56,12 +56,9 @@ def push_to_session(session_id: str, event: str, data: Dict[str, Any]):
 
 
 async def sse_generator(session_id: str, request: Request) -> AsyncGenerator[str, None]:
-    """
-    SSE 生成器，用于StreamingResponse
-    """
+    """SSE 生成器"""
     stream_queue = get_sse_queue(session_id)
     if stream_queue is None:
-        # 如果没有对应的队列，直接结束
         return
 
     try:
@@ -82,15 +79,13 @@ async def sse_generator(session_id: str, request: Request) -> AsyncGenerator[str
             event = msg.get("event")
             data = msg.get("data")
 
-            # 特殊关闭事件
+            # 关闭事件
             if event == "__close__":
                 break
 
             yield _sse_pack(event, data)
     except (asyncio.CancelledError, ConnectionResetError, BrokenPipeError):
-        # 生成器被取消/对端断开：静默退出
         return
     finally:
-        # 清理资源
         remove_sse_queue(session_id)
 

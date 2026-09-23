@@ -1,40 +1,59 @@
 """
-    任务状态管理，负责记录：
+`导入图`和`查询图`任务状态管理模块：
 
-        任务整体状态_tasks_status（pending、processing、completed or failed）：
-             {
-                "task-001": "processing",
-                ......
-            }
+    数据结构：
+        ①任务整体状态_tasks_status（pending、processing、completed / failed）
+        例：
+        {
+            "task_01": "processing",
+            "task_02": "completed","
+        }
 
-        任务最终结果_tasks_result：
-             {
-                "session-001": {
-                    "answer": "这是最终回答"
-                },
-                ......
-            }
+        ②正在执行节点_tasks_running_list
+        例：
+        {
+            "task_01": ["node_pdf_to_md"],
+            ......
+        }
 
-        正在执行节点_tasks_running_list：
-            {
-                "task-001": ["node_pdf_to_md"],
-                ......
-            }
+        ③执行完成节点_tasks_done_list
+        例：
+        {
+            "task_01": [ "node_entry", "node_pdf_to_md"],
+            ......
+        }
 
-        执行完成节点_tasks_done_list：
-            {
-                "task-001": [ "node_entry", "node_pdf_to_md"],
-                ......
-            }
+        ④任务最终结果_tasks_result
+        例：
+        {
+            "session_01": {"answer": "这是最终回答"},
+            ......
+        }
 
+
+    配套方法：
+        add_running_task - 添加 "正在执行节点"
+        add_done_task - 添加 "执行完成节点"
+        set_task_result - 存储 "任务结果"字段
+
+        get_task_status - 获取 "任务状态"
+        get_running_task_list - 获取 "正在执行节点"
+        get_done_task_list - 获取 "执行完成节点"
+        get_task_result - 获取 "任务结果"字段
+
+        update_task_status - 更新 "任务状态"
+
+        clear_task - 清除任务
 """
 from typing import Dict, List
 from .sse_util import push_to_session
 
+
+# —————————————————————————————————————————————————  数据结构 ———————————————————————————————————————————————————
+_tasks_status: Dict[str, str] = {}                  # 任务状态
 _tasks_running_list: Dict[str, List[str]] = {}      # 正在执行节点
 _tasks_done_list: Dict[str, List[str]] = {}         # 执行完成节点
-_tasks_status: Dict[str, str] = {}                  # 任务状态
-_tasks_result: Dict[str, Dict[str, str]] = {}       # 任务执行结果
+_tasks_result: Dict[str, Dict[str, str]] = {}       # 任务结果
 
 # 任务状态
 TASK_STATUS_PENDING = "pending"
@@ -42,7 +61,7 @@ TASK_STATUS_PROCESSING = "processing"
 TASK_STATUS_COMPLETED = "completed"
 TASK_STATUS_FAILED = "failed"
 
-# 节点名与中文名映射表
+# 节点中文名映射表
 _NODE_NAME_TO_CN: Dict[str, str] = {
 
     # —— Import 流程 ——
@@ -72,11 +91,10 @@ _NODE_NAME_TO_CN: Dict[str, str] = {
 }
 
 
-def _ensure_task(task_id: str) -> None:
-    """
-    确保task_id对应的数据结构已初始化。
 
-    """
+# —————————————————————————————————————————————————  配套函数 ———————————————————————————————————————————————————
+def _ensure_task(task_id: str) -> None:
+    """确保 task_id 对应的任务数据结构存在。"""
     if task_id not in _tasks_running_list:
         _tasks_running_list[task_id] = []
     if task_id not in _tasks_done_list:
@@ -84,50 +102,29 @@ def _ensure_task(task_id: str) -> None:
     if task_id not in _tasks_result:
         _tasks_result[task_id] = {}
 
-
 def _to_cn(node_name: str) -> str:
-    """
-    将节点名转换为中文展示名；若无映射则返回原名。
-
-    """
+    """ 将节点名转换为中文 """
     return _NODE_NAME_TO_CN.get(node_name, node_name)
 
 
 def add_running_task(task_id: str, node_name: str, is_stream: bool = False) -> None:
-    """
-    添加“正在执行节点”
-
-    Args：
-        task_id - 任务id
-        node_name - 节点名
-    """
+    """ 添加 "正在执行节点" """
     _ensure_task(task_id)
     running = _tasks_running_list[task_id]
-    # 避免重复追加
+
     if node_name not in running:
         running.append(node_name)
 
     if is_stream:
         task_push_queue(task_id)
 
-
 def add_done_task(task_id: str, node_name: str, is_stream: bool = False) -> None:
-    """
-    添加“执行完成节点”
-
-    注意：添加已完成任务时，把同名“正在执行的节点”删除。
-
-    Args:
-        task_id - 任务ID
-        node_name -  节点名
-    """
+    """ 添加 "执行完成节点"，并删除对应 "正在执行节点" """
     _ensure_task(task_id)
 
-    # 在“正在执行节点”中移除同名节点
     running = _tasks_running_list[task_id]
     _tasks_running_list[task_id] = [n for n in running if n != node_name]
 
-    # 添加到 “已完成节点”
     done = _tasks_done_list[task_id]
     if node_name not in done:
         done.append(node_name)
@@ -135,65 +132,35 @@ def add_done_task(task_id: str, node_name: str, is_stream: bool = False) -> None
     if is_stream:
         task_push_queue(task_id)
 
-
 def set_task_result(task_id: str, key: str, value: str) -> None:
-    """
-    存储最终任务结果。
-    """
+    """存储 task_id 任务结果字段。"""
     _ensure_task(task_id)
     _tasks_result[task_id][key] = value
 
-
 def get_task_result(task_id: str, key: str, default: str = "") -> str:
-    """
-    获取任务结果字段（如 answer / error）。
-    """
+    """获取 task_id 任务结果对应字段（如 answer / error）。"""
     _ensure_task(task_id)
     return _tasks_result.get(task_id, {}).get(key, default)
 
-
 def get_task_status(task_id: str) -> str:
-    """
-    获取当前任务状态。
-
-    Args：
-        task_id
-
-    Returns：
-        状态名称
-    """
+    """获取 task_id 对应 任务状态"""
     return _tasks_status.get(task_id, "")
 
+def get_running_task_list(task_id: str) -> List[str]:
+    """获取 task_id 对应 "正在执行节点" 列表。"""
+    _ensure_task(task_id)
+    running = _tasks_running_list.get(task_id, [])
+    return [_to_cn(n) for n in running]
 
 def get_done_task_list(task_id: str) -> List[str]:
-    """
-    获取已完成节点列表（中文展示）。
-
-
-    """
+    """获取 task_id 对应 "执行完成节点" 列表。"""
     _ensure_task(task_id)
     done = _tasks_done_list.get(task_id, [])
     return [_to_cn(n) for n in done]
 
 
-def get_running_task_list(task_id: str) -> List[str]:
-    """
-    获取正在运行节点列表（中文）。
-
-    """
-    _ensure_task(task_id)
-    running = _tasks_running_list.get(task_id, [])
-    return [_to_cn(n) for n in running]
-
-
 def update_task_status(task_id: str, status_name: str, push_queue: bool = False) -> None:
-    """
-    更新任务状态。
-
-    Args:
-        task_id - 任务id
-        status_name - 状态名称
-    """
+    """更新 task_id 对应任务状态。"""
     _tasks_status[task_id] = status_name
 
     if status_name in {
@@ -213,8 +180,8 @@ def task_push_queue(task_id: str):
     })
 
 
-
 def clear_task(task_id: str):
+    """ 清除task_id 对应 所有任务状态 """
     _tasks_running_list.pop(task_id, None)
     _tasks_done_list.pop(task_id, None)
     _tasks_status.pop(task_id, None)
