@@ -259,7 +259,7 @@ class NodeAnswerOutput(BaseNode):
 
     def _extract_images_from_docs(self, docs):
         """
-        辅助方法：从文档列表中提取图片URL
+        辅助方法：从文档列表中提取所有图片的URL
 
         核心逻辑：
         1. 遍历所有相关文档（包括本地知识库切片和联网搜索结果）。

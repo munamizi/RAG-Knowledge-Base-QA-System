@@ -1,0 +1,1500 @@
+﻿Question,Ground_truth,Context,Answer,Context_Precision,Context_Recall,Faithfulness,Answer_Relevancy,Answer_Correctness
+H3C LA2608-GM/GU室内无线网关可以提供什么服务，设备管理需要通过什么网络实现？,H3C LA2608-GM/GU室内无线网关可以为用户提供无线服务；为了实现设备管理，LA2608需要通过3G/4G网络连接到运营商无线控制器。,"[Context 1 | source=local | chunk_id=467914719130005118 | score=0.9789886190438886]
+## 1.1 概述
+
+H3C LA2608-GM/GU 室内无线网关（以下简称 LA2608）可以为用户提供无线服务，为了实现对设备的管理，LA2608需要通过 3G/4G网络连接到运营商无线控制器。
+
+![](images/16288d553bf867b279adb856534213ef37a0d17bdec59c9c4abf824878cd7e56.jpg)
+
+说明
+
+目前，LA2608只支持与 H3C公司的无线控制器互通。
+
+[Context 2 | source=local | chunk_id=467914719130005116 | score=0.7131610642896953]
+## 目 录
+
+1 H3C LA2608 室内无线网关用户手册 …… 1
+1.1 概述 …… 1
+1.2 配置LA2608与无线控制器互通 …… 1
+1.2.1 配置LA2608 …… 1
+1.2.2 配置运营商无线控制器 …… 2
+1.2.3 验证LA2608与无线控制器是否连通 …… 3
+
+[Context 3 | source=local | chunk_id=467914719130005117 | score=0.6914535078461406]
+## 1 H3C LA2608 室内无线网关用户手册
+
+[Context 4 | source=web | url=https://www.h3c.com/cn/Service/Document_Software/Document_Center/Routers/Catalog/LA_wireless/H3C_LA3616/Command/Command_Manual/H3C_LA_CR(V7)-R0304-6W101/ | score=0.6616334756768629]
+H3C LA系列无线网关 命令参考(V7)-R0304-6W101
+
+[Context 5 | source=local | chunk_id=467914719130005119 | score=0.64807025686964]
+## 1.2 配置LA2608与无线控制器互通
+
+如 图 1 所示，LA2608 安装了SIM卡，通过 3G/4G网络连接到运营商无线控制器，并向用户提供无线服务。关于LA2608的安装方法，请参见“H3C LA2608室内无线网关 快速安装指南”。
+
+图1 配置 LA2608与无线控制器互通
+
+![](images/2436b496658837dfc940d48d8565fa9a9135932ebf6e2c2a25e9fff4f674dd39.jpg)
+
+[Context 6 | source=local | chunk_id=467914719130005115 | score=0.6456334732367115]
+# H3C LA2608 室内无线网关
+
+用户手册
+
+Copyright © 2014 杭州华三通信技术有限公司及其许可者 版权所有，保留一切权利。
+
+未经本公司书面许可，任何单位和个人不得擅自摘抄、复制本书内容的部分或全部，并不得以任何形式传播。
+
+H3C、 、Aolynk、 Aolynk 、H<sup>3</sup>Care、 Heare TOP G, TOPG IRF、NetPilot、Neocean、NeoVTL、SecPro、SecPoint、SecEngine、SecPath、Comware、Secware、Storware、NQA、VVG、V<sup>2</sup>G、V<sup>n</sup>G、PSPT、XGbus、N-Bus、TiGem、InnoVision、HUASAN、华三均为杭州华三通信技术有限公司的商标。对于本手册中出现的其它公司的商标、产品标识及商品名称，由各自权利人拥有。
+
+由于产品版本升级或其他原因，本手册内容有可能变更。H3C保留在没有任何通知或者提示的情况下对本手册的内容进行修改的权利。本手册仅作为使用指导，H3C尽全力在本手册中提供准确的信息，但是 H3C 并不确保手册内容完全没有错误，本手册中的所有陈述、信息和建议也不构成任何明示或暗示的担保。
+
+[Context 7 | source=web | url=https://www.h3c.com/cn/Service/Document_Software/Document_Center/Routers/Catalog/LA_wireless/H3C_LA2608/Default.htm | score=0.5864360634465574]
+H3C LA2608 室内型无线网关 Aolynk产品 Aolynk产品 如何购买 案例中心New 数字化领航直播间 云上展厅 新华三商城 H3C LA2608 室内型无线网关 订阅 阅读量 评分 时间 选择版本 全部版本 订阅 快速安装指南 H3C LA2608室内无线网关 快速安装指南-AP101 2014-03-03 类型:快速安装指南 安装指导 H3C 设备防雷安装指导手册(V1.02) 2021-10-20 类型:安装指导 安全和兼容性手册 H3C LA2608室内无线网关安全兼容性手册-6W103 2017-04-14 类型:安全和兼容性手册 License指南 H3C 交换机及路由器产品 通用License使用指南-6W107 2026-07-27 类型:License指南 用户手册 H3C LA2608室内无线网关 用户手册-6W100 2014-03-03 类型:用户手册 H3C个人资料库 H3C个人资料库 2022-01-29 类型:H3C个人资料库
+
+[Context 8 | source=local | chunk_id=467914719130005120 | score=0.48440138400405586]
+## 1.2.1 配置LA2608
+
+(1) 配置拨号访问组的拨号控制列表
+
+```txt
+<LA2608>system-view
+[LA2608]dialer-rule 1 ip permit
+(2) 配置 DCC 拨号
+```
+
+![](images/06474f326a73aa174281952c2d7a262f50b5a813a0a0523744c4cc52374ef0fd.jpg)
+
+dialer number命令用来配置发起呼叫的拨号串，不同运营商的拨号串不同，请用户在配置前向网络运营商获取发起呼叫的拨号串。
+
+```powershell
+[LA2608]interface Cellular-Ethernet2/0
+[LA2608-Cellular-Ethernet2/0]ip address cellular-allocated
+[LA2608-Cellular-Ethernet2/0]dialer enable-circular
+[LA2608-Cellular-Ethernet2/0]dialer-group 1
+[LA2608-Cellular-Ethernet2/0]dialer timer idle 0
+```
+
+```txt
+[LA2608-Cellular-Ethernet2/0]dialer timer autodial 5
+[LA2608-Cellular-Ethernet2/0]dialer number *99# autodial
+[LA2608-Cellular-Ethernet2/0]nat outbound
+[LA2608-Cellular-Ethernet2/0]quit
+
+(3) 配置 DNS 解析功能
+[LA2608]dns resolve
+
+(4) 配置静态路由
+[LA2608]ip route-static 0.0.0.0 0.0.0.0 Cellular-Ethernet2/0
+
+(5) 指定运营商无线控制器的 IP 地址
+[LA2608] wlan ac ip 60.191.99.143
+```
+
+## 1.2.2 配置运营商无线控制器
+
+![](images/08e8c1c7f9c7f47a615d8449dea68240baed840efe2f63d2a292dceb249bef98.jpg)
+
+## 说明
+
+如下配置仅供参考，运营商可根据实际情况进行调整。
+
+## (1) 创建业务 VLAN
+
+```txt
+(1) 创建业务 VLAN
+<AC>system-view
+[AC]vlan 2
+[AC-vlan2] quit
+(2) 创建 WLAN-ESS 接口并加入业务 VLAN
+[AC]interface WLAN-ESS 1
+[AC-WLAN-ESS1]port access vlan 2
+[AC-WLAN-ESS1]quit
+(3) 配置明文方式的服务模板
+[AC]wlan service-template 1 clear
+[AC-wlan-st-1]ssid ssidh3c
+[AC-wlan-st-1]bind WLAN-ESS 1
+[AC-wlan-st-1]service-template enable
+Please wait... Done.
+[AC-wlan-st-1]quit
+(4) 开启自动 AP 功能
+[AC]wlan auto-ap enable
+[AC]wlan ap 2608 model LA2608 id 1
+[AC-wlan-ap-2608]serial-id auto
+[AC-wlan-ap-2608]radio 1
+[AC-wlan-ap-2608-radio-1]service-template 1
+[AC-wlan-ap-2608-radio-1]radio enable
+[AC-wlan-ap-2608-radio-1]quit
+[AC-wlan-ap-2608]quit
+(5) 配置 VLAN 接口 IP 地址
+[AC]interface Vlan-interface 1
+[AC-Vlan-interface1]ip address 60.191.99.143 255.255.0.0
+[AC-Vlan-interface1]quit
+[AC]interface Vlan-interface 2
+[AC-Vlan-interface2]ip address 10.249.136.1 255.255.252.0
+[AC-Vlan-interface2]quit
+(6) 使能 DHCP 服务，配置 DHCP 地址池
+```
+
+[Context 9 | source=local | chunk_id=467914719130005121 | score=0.3987609438128584]
+## 1.2.1 配置LA2608
+
+```txt
+[AC]dhcp enable
+[AC]dhcp server ip-pool vlan2
+[AC-dhcp-pool-vlan1]network 10.249.136.0 22
+[AC-dhcp-pool-vlan1]gateway-list 10.249.136.1
+[AC-dhcp-pool-vlan1]dns-list 218.201.96.130
+[AC-dhcp-pool-vlan1]quit
+```
+
+## 1.2.3 验证LA2608 与无线控制器是否连通
+
+在无线控制器上执行 display wlan ap 命令，state 字段显示为“R/M”，表示 LA2608 与无线控制器之间已经建立连接。
+
+```txt
+<Sysname> display wlan ap all
+Total Number of APs configured : 1
+Total Number of configured APs connected : 1
+Total Number of auto APs connected : 0
+AP Profiles
+State : I = Idle, J = Join, JA = JoinAck, IL = ImageLoad
+C = Config, R = Run, KU = KeyUpdate, KC = KeyCfm
+M = Master, B = Backup
+```
+
+```csv
+AP Name State Model Serial-ID
+ap1 R/M LA2608 036286A054000033
+```
+
+[Context 10 | source=web | url=https://g.pconline.com.cn/ask/634305.html | score=0.337510825151329]
+整个过程无需额外软件,全程依托网页界面引导式操作,支持wpa2-psk或wpa3加密标准,兼顾安全与兼容性;用户需准确填写宽带账号密码以完成pppoe拨号,并建议启用dhcp自动分配局域网ip地址,同时修改默认管理员密码、关闭wps功能以提升基础防护能力。根据h3c官方技术文档与多款主流型号实测反馈,该设置流程稳定可靠,平均耗时约5分钟,适用于家庭及小型办公场景,且所有配置项均符合国家无线电管理委员会及gb/t 15629.11系列无线网络安全规范要求。 一、进入无线设置模块 在成功登录路由器管理界面后,点击顶部导航栏中的“无线设置”选项,进入配置页面。此处默认显示2.4ghz频段参数,若设备支持双频,则需分别设置2.4ghz与5ghz两个网络。ssid名称建议采用无特殊字符、不含空格的英文或数字组合,避免使用个人信息以防隐私泄露;同时注意区分大小写,部分终端设备对ssid大小写敏感。5ghz频段可手动选择信道(推荐36、40、44、48等非重叠信道),以减少同频干扰,提升多设备并发连接稳定性。 二、配置安全加密与密码策略 在“无线安全设置”子项中,加密方式必须选择wpa2-psk(aes)或wpa3-sae,前者兼容性更广,后者安全性更高但需终端系统支持。密码长度不得少于8位,且应包含大小写字母、数字及至少一个符号(如!、@、#),禁用常见弱口令如“12345678”“admin123”等。h3c官方实测数据显示,启用wpa3后,暴力破解平均耗时提升至12年以上,显著优于wpa2。 三、高级功能启用与优化 勾选“开启无线广播”确保网络可见性;启用“无线客户端隔离”可防止局域网内设备相互访问,适用于访客网络场景;将“无线模式”设为“802.11ax/n/ac混合”兼顾新旧终端兼容性。对于家庭多房间覆盖需求,建议关闭“无线信号强度自动调节”,手动设为“高功率”,并配合信道扫描工具选择当前区域干扰最小的信道。 四、保存并验证配置生效 全部设置完成后,务必点击右下角“应用”按钮而非仅“保存”,确保参数实时写入硬件。重启无线模块或整机后,使用手机或笔记本重新连接新ssid,输入密码完成认证。可通过管理界面“无线状态”页查看已连接设备列表及信号强度,确认无异常离线或重复ip冲突现象。 五、后续维护建议 首次设置完成后,建议导出当前配置文件备份至本地;每季度检查一","H3C LA2608-GM/GU室内无线网关可以为用户提供**无线服务**（如Wi-Fi接入等）。
+
+设备管理需要通过**3G/4G网络**连接到运营商的无线控制器来实现。  
+说明：根据资料，LA2608仅支持与H3C公司的无线控制器互通，且必须依赖SIM卡和3G/4G网络建立连接，无法通过本地有线网络或其他方式直接管理。
+
+【图片】
+images/16288d553bf867b279adb856534213ef37a0d17bdec59c9c4abf824878cd7e56.jpg
+images/2436b496658837dfc940d48d8565fa9a9135932ebf6e2c2a25e9fff4f674dd39.jpg",0.5916666666469445,1.0,0.6666666666666666,0.8932840531460018,0.5400124299308685
+H3C LA2608目前支持与哪些厂商的无线控制器互通？,目前，LA2608只支持与H3C公司的无线控制器互通。,"[Context 1 | source=local | chunk_id=467914719130005118 | score=0.9832035130446983]
+## 1.1 概述
+
+H3C LA2608-GM/GU 室内无线网关（以下简称 LA2608）可以为用户提供无线服务，为了实现对设备的管理，LA2608需要通过 3G/4G网络连接到运营商无线控制器。
+
+![](images/16288d553bf867b279adb856534213ef37a0d17bdec59c9c4abf824878cd7e56.jpg)
+
+说明
+
+目前，LA2608只支持与 H3C公司的无线控制器互通。
+
+[Context 2 | source=local | chunk_id=467914719130005116 | score=0.909428593963195]
+## 目 录
+
+1 H3C LA2608 室内无线网关用户手册 …… 1
+1.1 概述 …… 1
+1.2 配置LA2608与无线控制器互通 …… 1
+1.2.1 配置LA2608 …… 1
+1.2.2 配置运营商无线控制器 …… 2
+1.2.3 验证LA2608与无线控制器是否连通 …… 3
+
+[Context 3 | source=local | chunk_id=467914719130005119 | score=0.7320700870574479]
+## 1.2 配置LA2608与无线控制器互通
+
+如 图 1 所示，LA2608 安装了SIM卡，通过 3G/4G网络连接到运营商无线控制器，并向用户提供无线服务。关于LA2608的安装方法，请参见“H3C LA2608室内无线网关 快速安装指南”。
+
+图1 配置 LA2608与无线控制器互通
+
+![](images/2436b496658837dfc940d48d8565fa9a9135932ebf6e2c2a25e9fff4f674dd39.jpg)
+
+[Context 4 | source=local | chunk_id=467914719130005115 | score=0.6731581809865422]
+# H3C LA2608 室内无线网关
+
+用户手册
+
+Copyright © 2014 杭州华三通信技术有限公司及其许可者 版权所有，保留一切权利。
+
+未经本公司书面许可，任何单位和个人不得擅自摘抄、复制本书内容的部分或全部，并不得以任何形式传播。
+
+H3C、 、Aolynk、 Aolynk 、H<sup>3</sup>Care、 Heare TOP G, TOPG IRF、NetPilot、Neocean、NeoVTL、SecPro、SecPoint、SecEngine、SecPath、Comware、Secware、Storware、NQA、VVG、V<sup>2</sup>G、V<sup>n</sup>G、PSPT、XGbus、N-Bus、TiGem、InnoVision、HUASAN、华三均为杭州华三通信技术有限公司的商标。对于本手册中出现的其它公司的商标、产品标识及商品名称，由各自权利人拥有。
+
+由于产品版本升级或其他原因，本手册内容有可能变更。H3C保留在没有任何通知或者提示的情况下对本手册的内容进行修改的权利。本手册仅作为使用指导，H3C尽全力在本手册中提供准确的信息，但是 H3C 并不确保手册内容完全没有错误，本手册中的所有陈述、信息和建议也不构成任何明示或暗示的担保。
+
+[Context 5 | source=local | chunk_id=467914719130005121 | score=0.6091260836116537]
+## 1.2.1 配置LA2608
+
+```txt
+[AC]dhcp enable
+[AC]dhcp server ip-pool vlan2
+[AC-dhcp-pool-vlan1]network 10.249.136.0 22
+[AC-dhcp-pool-vlan1]gateway-list 10.249.136.1
+[AC-dhcp-pool-vlan1]dns-list 218.201.96.130
+[AC-dhcp-pool-vlan1]quit
+```
+
+## 1.2.3 验证LA2608 与无线控制器是否连通
+
+在无线控制器上执行 display wlan ap 命令，state 字段显示为“R/M”，表示 LA2608 与无线控制器之间已经建立连接。
+
+```txt
+<Sysname> display wlan ap all
+Total Number of APs configured : 1
+Total Number of configured APs connected : 1
+Total Number of auto APs connected : 0
+AP Profiles
+State : I = Idle, J = Join, JA = JoinAck, IL = ImageLoad
+C = Config, R = Run, KU = KeyUpdate, KC = KeyCfm
+M = Master, B = Backup
+```
+
+```csv
+AP Name State Model Serial-ID
+ap1 R/M LA2608 036286A054000033
+```","H3C LA2608目前仅支持与H3C公司的无线控制器互通。  
+根据资料明确说明：“目前，LA2608只支持与 H3C公司的无线控制器互通。”  
+不支持与其他厂商（如华为、Cisco、Aruba等）的无线控制器互通。
+
+【图片】
+images/16288d553bf867b279adb856534213ef37a0d17bdec59c9c4abf824878cd7e56.jpg",0.9999999999,1.0,1.0,0.9146382079329372,0.6604485898995209
+配置H3C LA2608拨号访问组的拨号控制列表时应使用什么命令？,进入系统视图后执行命令“dialer-rule 1 ip permit”。,"[Context 1 | source=local | chunk_id=467914719130005120 | score=0.9570258187413213]
+## 1.2.1 配置LA2608
+
+(1) 配置拨号访问组的拨号控制列表
+
+```txt
+<LA2608>system-view
+[LA2608]dialer-rule 1 ip permit
+(2) 配置 DCC 拨号
+```
+
+![](images/06474f326a73aa174281952c2d7a262f50b5a813a0a0523744c4cc52374ef0fd.jpg)
+
+dialer number命令用来配置发起呼叫的拨号串，不同运营商的拨号串不同，请用户在配置前向网络运营商获取发起呼叫的拨号串。
+
+```powershell
+[LA2608]interface Cellular-Ethernet2/0
+[LA2608-Cellular-Ethernet2/0]ip address cellular-allocated
+[LA2608-Cellular-Ethernet2/0]dialer enable-circular
+[LA2608-Cellular-Ethernet2/0]dialer-group 1
+[LA2608-Cellular-Ethernet2/0]dialer timer idle 0
+```
+
+```txt
+[LA2608-Cellular-Ethernet2/0]dialer timer autodial 5
+[LA2608-Cellular-Ethernet2/0]dialer number *99# autodial
+[LA2608-Cellular-Ethernet2/0]nat outbound
+[LA2608-Cellular-Ethernet2/0]quit
+
+(3) 配置 DNS 解析功能
+[LA2608]dns resolve
+
+(4) 配置静态路由
+[LA2608]ip route-static 0.0.0.0 0.0.0.0 Cellular-Ethernet2/0
+
+(5) 指定运营商无线控制器的 IP 地址
+[LA2608] wlan ac ip 60.191.99.143
+```
+
+## 1.2.2 配置运营商无线控制器
+
+![](images/08e8c1c7f9c7f47a615d8449dea68240baed840efe2f63d2a292dceb249bef98.jpg)
+
+## 说明
+
+如下配置仅供参考，运营商可根据实际情况进行调整。
+
+## (1) 创建业务 VLAN
+
+```txt
+(1) 创建业务 VLAN
+<AC>system-view
+[AC]vlan 2
+[AC-vlan2] quit
+(2) 创建 WLAN-ESS 接口并加入业务 VLAN
+[AC]interface WLAN-ESS 1
+[AC-WLAN-ESS1]port access vlan 2
+[AC-WLAN-ESS1]quit
+(3) 配置明文方式的服务模板
+[AC]wlan service-template 1 clear
+[AC-wlan-st-1]ssid ssidh3c
+[AC-wlan-st-1]bind WLAN-ESS 1
+[AC-wlan-st-1]service-template enable
+Please wait... Done.
+[AC-wlan-st-1]quit
+(4) 开启自动 AP 功能
+[AC]wlan auto-ap enable
+[AC]wlan ap 2608 model LA2608 id 1
+[AC-wlan-ap-2608]serial-id auto
+[AC-wlan-ap-2608]radio 1
+[AC-wlan-ap-2608-radio-1]service-template 1
+[AC-wlan-ap-2608-radio-1]radio enable
+[AC-wlan-ap-2608-radio-1]quit
+[AC-wlan-ap-2608]quit
+(5) 配置 VLAN 接口 IP 地址
+[AC]interface Vlan-interface 1
+[AC-Vlan-interface1]ip address 60.191.99.143 255.255.0.0
+[AC-Vlan-interface1]quit
+[AC]interface Vlan-interface 2
+[AC-Vlan-interface2]ip address 10.249.136.1 255.255.252.0
+[AC-Vlan-interface2]quit
+(6) 使能 DHCP 服务，配置 DHCP 地址池
+```
+
+[Context 2 | source=web | url=https://support.huawei.com/enterprise/zh/doc/EDOC1100332387/9cecefdd | score=0.7936018705248981]
+操作步骤 执行命令system-view,进入系统视图。 (可选)配置拨号控制列表。 采用按需拨号时才需要执行本步骤。 执行命令dialer-rule,进入Dialer-rule视图。 执行命令dialer-ruledialer-rule-number{ acl{ acl-number| nameacl-name} | ip{ deny| permit} | ipv6{ deny| permit} },配置某个拨号访问组对应的拨号访问控制列表。 缺省情况下,未配置任何拨号访问控制列表。 执行命令quit,退回到系统视图。 执行命令interface dialernumber,创建Dialer接口并进入Dialer接口视图。 执行命令dialer useruser-name,使能共享DCC功能。 缺省情况下,共享DCC处于去使能状态且没有配置对端用户名。 执行命令dialer bundlenumber,指定Dialer接口使用的Dialer bundle。 (可选)执行命令dialer-groupgroup-number,配置接口所属的拨号访问组。 采用按需拨号时才需要执行本步骤。 必须确保命令dialer-group中的参数group-number和命令dialer-rule中的dialer-rule-number保持一致。 (可选)执行命令dialer retry limitcountsquiet-periodperiod,配置静默时间和静默时间内的重传次数。
+
+[Context 3 | source=web | url=https://www.cnblogs.com/liulinhui/p/14331986.html | score=0.7118745884000292]
+H3C路由器PPPOE拨号上网 命令行配置举例 建立拨号组拨号控制列表 dialer-group 1 rule ip permit 建立拨号接口1 interface dialer 1 开启DDR共享 dialer bundle enable 配置接口管理拨号组 dialer-group 1 接口接受PPP协商产生的由Server端分配的IP地址 ip address ppp-negotiate 设置链路空闲时间为0 dialer timer idle 0 配置ppp chap 验证名 ppp chap user 123456 配置ppp chap 验证密码 ppp chap password cipher 123456 填写运营商给的用户名和密码 ppp pap local-user 123456 password cipher 123456 建立ppp会话,绑定相应三层接口 interface GigabitEthernet 0/0 pppoe-client dial-bundle-number 1 ############################################### 配置nat转换 interface Dialer 1 nat outbound ################################################ 配置默认路由,出口指向拨号口1 ip route-static 0.0.0.0 0.0.0.0 Dialer1 ################################################ 配置内网DHCP interface GigabitEthernet 0/1 ip address 192.168.100.1 24 # DHCP enable # dhcp server ip-pool 1 network 192.168.100.0 24 gateway-list 192.168.100.1 dns-list 114.114.114.114 ########################### 备注: dialer timer idle 0 当一条链路建立后,dialer timer idle定时起作用。若在设定的时间内没有感兴趣报文在此链路上传送,则DDR自动挂断链路。 如果配置命令时不指定in和in-out参数,则表示只有出方向的感兴趣报文重置定时器。 若dialer timer idle设定为0,则相应的链路在建立后,无论是否有感兴趣报文在此链路上传送,链路将永远不被挂断。对于PPPoE Client应用,若dialer timer idle设定为0,则将会自动触发拨号保证链接永久在线。
+
+[Context 4 | source=local | chunk_id=467914719130005116 | score=0.659391444224877]
+## 目 录
+
+1 H3C LA2608 室内无线网关用户手册 …… 1
+1.1 概述 …… 1
+1.2 配置LA2608与无线控制器互通 …… 1
+1.2.1 配置LA2608 …… 1
+1.2.2 配置运营商无线控制器 …… 2
+1.2.3 验证LA2608与无线控制器是否连通 …… 3
+
+[Context 5 | source=web | url=https://www.h3c.com/cn/Service/Document_Software/Document_Center/Routers/Catalog/LA_wireless/H3C_LA2608/Default.htm | score=0.5790792805309439]
+Aolynk产品 Aolynk产品 如何购买 案例中心New 数字化领航直播间 云上展厅 新华三商城 H3C LA2608 室内型无线网关 订阅 阅读量 评分 选择版本 全部版本 订阅 2014-03-03 类型:快速安装指南 安装指导 H3C 设备防雷安装指导手册(V1.02) 2021-10-20 类型:安装指导 安全和兼容性手册 2017-04-14 类型:安全和兼容性手册 2026-07-27 类型:License指南 用户手册 2014-03-03 类型:用户手册 H3C个人资料库 2022-01-29 类型:H3C个人资料库
+
+[Context 6 | source=local | chunk_id=467914719130005118 | score=0.5558524266098093]
+## 1.1 概述
+
+H3C LA2608-GM/GU 室内无线网关（以下简称 LA2608）可以为用户提供无线服务，为了实现对设备的管理，LA2608需要通过 3G/4G网络连接到运营商无线控制器。
+
+![](images/16288d553bf867b279adb856534213ef37a0d17bdec59c9c4abf824878cd7e56.jpg)
+
+说明
+
+目前，LA2608只支持与 H3C公司的无线控制器互通。
+
+[Context 7 | source=web | url=https://www.h3c.com/cn/d_202603/2789624_30005_0.htm | score=0.5053915419771111]
+01-基础配置命令参考 H3C MSR610[810][830][1000S][2600][3600]路由器 命令参考(V7)-R6749-6W11101-基础配置命令参考 H3C MSR610[810][830][1000S][2600][3600]路由器 命令参考(V7)-R6749-6W111
+
+[Context 8 | source=local | chunk_id=467914719130005121 | score=0.41816153596362027]
+## 1.2.1 配置LA2608
+
+```txt
+[AC]dhcp enable
+[AC]dhcp server ip-pool vlan2
+[AC-dhcp-pool-vlan1]network 10.249.136.0 22
+[AC-dhcp-pool-vlan1]gateway-list 10.249.136.1
+[AC-dhcp-pool-vlan1]dns-list 218.201.96.130
+[AC-dhcp-pool-vlan1]quit
+```
+
+## 1.2.3 验证LA2608 与无线控制器是否连通
+
+在无线控制器上执行 display wlan ap 命令，state 字段显示为“R/M”，表示 LA2608 与无线控制器之间已经建立连接。
+
+```txt
+<Sysname> display wlan ap all
+Total Number of APs configured : 1
+Total Number of configured APs connected : 1
+Total Number of auto APs connected : 0
+AP Profiles
+State : I = Idle, J = Join, JA = JoinAck, IL = ImageLoad
+C = Config, R = Run, KU = KeyUpdate, KC = KeyCfm
+M = Master, B = Backup
+```
+
+```csv
+AP Name State Model Serial-ID
+ap1 R/M LA2608 036286A054000033
+```
+
+[Context 9 | source=local | chunk_id=467914719130005119 | score=0.40727049941376536]
+## 1.2 配置LA2608与无线控制器互通
+
+如 图 1 所示，LA2608 安装了SIM卡，通过 3G/4G网络连接到运营商无线控制器，并向用户提供无线服务。关于LA2608的安装方法，请参见“H3C LA2608室内无线网关 快速安装指南”。
+
+图1 配置 LA2608与无线控制器互通
+
+![](images/2436b496658837dfc940d48d8565fa9a9135932ebf6e2c2a25e9fff4f674dd39.jpg)","配置 H3C LA2608 拨号访问组的拨号控制列表时，应使用以下命令：
+
+1. 进入系统视图：  
+   `system-view`
+
+2. 配置拨号规则（拨号访问控制列表），允许 IP 流量触发拨号：  
+   `dialer-rule 1 ip permit`
+
+该命令定义了拨号访问组 1 的控制规则，表示匹配的 IP 报文可触发拨号。后续需通过 `dialer-group 1` 将此规则关联到 Cellular-Ethernet2/0 接口（如参考内容[1]所示）。
+
+【图片】
+images/06474f326a73aa174281952c2d7a262f50b5a813a0a0523744c4cc52374ef0fd.jpg",0.9999999999666667,1.0,1.0,0.9223777951349335,0.603020456465025
+配置H3C LA2608的dialer number拨号串前应从哪里获取拨号串，手册示例使用什么拨号串？,不同运营商的拨号串不同，配置前应向网络运营商获取发起呼叫的拨号串；手册示例使用“dialer number *99# autodial”，其中拨号串为*99#。,"[Context 1 | source=local | chunk_id=467914719130005120 | score=0.9430487720497895]
+## 1.2.1 配置LA2608
+
+(1) 配置拨号访问组的拨号控制列表
+
+```txt
+<LA2608>system-view
+[LA2608]dialer-rule 1 ip permit
+(2) 配置 DCC 拨号
+```
+
+![](images/06474f326a73aa174281952c2d7a262f50b5a813a0a0523744c4cc52374ef0fd.jpg)
+
+dialer number命令用来配置发起呼叫的拨号串，不同运营商的拨号串不同，请用户在配置前向网络运营商获取发起呼叫的拨号串。
+
+```powershell
+[LA2608]interface Cellular-Ethernet2/0
+[LA2608-Cellular-Ethernet2/0]ip address cellular-allocated
+[LA2608-Cellular-Ethernet2/0]dialer enable-circular
+[LA2608-Cellular-Ethernet2/0]dialer-group 1
+[LA2608-Cellular-Ethernet2/0]dialer timer idle 0
+```
+
+```txt
+[LA2608-Cellular-Ethernet2/0]dialer timer autodial 5
+[LA2608-Cellular-Ethernet2/0]dialer number *99# autodial
+[LA2608-Cellular-Ethernet2/0]nat outbound
+[LA2608-Cellular-Ethernet2/0]quit
+
+(3) 配置 DNS 解析功能
+[LA2608]dns resolve
+
+(4) 配置静态路由
+[LA2608]ip route-static 0.0.0.0 0.0.0.0 Cellular-Ethernet2/0
+
+(5) 指定运营商无线控制器的 IP 地址
+[LA2608] wlan ac ip 60.191.99.143
+```
+
+## 1.2.2 配置运营商无线控制器
+
+![](images/08e8c1c7f9c7f47a615d8449dea68240baed840efe2f63d2a292dceb249bef98.jpg)
+
+## 说明
+
+如下配置仅供参考，运营商可根据实际情况进行调整。
+
+## (1) 创建业务 VLAN
+
+```txt
+(1) 创建业务 VLAN
+<AC>system-view
+[AC]vlan 2
+[AC-vlan2] quit
+(2) 创建 WLAN-ESS 接口并加入业务 VLAN
+[AC]interface WLAN-ESS 1
+[AC-WLAN-ESS1]port access vlan 2
+[AC-WLAN-ESS1]quit
+(3) 配置明文方式的服务模板
+[AC]wlan service-template 1 clear
+[AC-wlan-st-1]ssid ssidh3c
+[AC-wlan-st-1]bind WLAN-ESS 1
+[AC-wlan-st-1]service-template enable
+Please wait... Done.
+[AC-wlan-st-1]quit
+(4) 开启自动 AP 功能
+[AC]wlan auto-ap enable
+[AC]wlan ap 2608 model LA2608 id 1
+[AC-wlan-ap-2608]serial-id auto
+[AC-wlan-ap-2608]radio 1
+[AC-wlan-ap-2608-radio-1]service-template 1
+[AC-wlan-ap-2608-radio-1]radio enable
+[AC-wlan-ap-2608-radio-1]quit
+[AC-wlan-ap-2608]quit
+(5) 配置 VLAN 接口 IP 地址
+[AC]interface Vlan-interface 1
+[AC-Vlan-interface1]ip address 60.191.99.143 255.255.0.0
+[AC-Vlan-interface1]quit
+[AC]interface Vlan-interface 2
+[AC-Vlan-interface2]ip address 10.249.136.1 255.255.252.0
+[AC-Vlan-interface2]quit
+(6) 使能 DHCP 服务，配置 DHCP 地址池
+```
+
+[Context 2 | source=local | chunk_id=467914719130005116 | score=0.7436156580869708]
+## 目 录
+
+1 H3C LA2608 室内无线网关用户手册 …… 1
+1.1 概述 …… 1
+1.2 配置LA2608与无线控制器互通 …… 1
+1.2.1 配置LA2608 …… 1
+1.2.2 配置运营商无线控制器 …… 2
+1.2.3 验证LA2608与无线控制器是否连通 …… 3
+
+[Context 3 | source=web | url=https://support.huawei.com/enterprise/zh/doc/EDOC1100411189/fe7590ed | score=0.731824455828611]
+执行命令 dialer-group group-number ,配置拨号接口的拨号访问组。 缺省情况下,未配置DCC拨号控制列表及拨号接口所属的拨号访问组。 必须确保命令 dialer-group 中的参数 group-number 和命令 dialer-rule 中的 dialer-rule-number 保持一致。 执行命令 dialer number dial-number [ autodial ],配置呼叫一个对端的拨号串。 带autodial 参数表示为自动拨号;不带 autodial 参数表示为按需拨号。 拨号串由运营商提供,请向运营商获取。 配置认证接入用户。 接入服务器对分支设备进行认证,防止非法用户接入。
+
+[Context 4 | source=local | chunk_id=467914719130005115 | score=0.6311775256832115]
+# H3C LA2608 室内无线网关
+
+用户手册
+
+Copyright © 2014 杭州华三通信技术有限公司及其许可者 版权所有，保留一切权利。
+
+未经本公司书面许可，任何单位和个人不得擅自摘抄、复制本书内容的部分或全部，并不得以任何形式传播。
+
+H3C、 、Aolynk、 Aolynk 、H<sup>3</sup>Care、 Heare TOP G, TOPG IRF、NetPilot、Neocean、NeoVTL、SecPro、SecPoint、SecEngine、SecPath、Comware、Secware、Storware、NQA、VVG、V<sup>2</sup>G、V<sup>n</sup>G、PSPT、XGbus、N-Bus、TiGem、InnoVision、HUASAN、华三均为杭州华三通信技术有限公司的商标。对于本手册中出现的其它公司的商标、产品标识及商品名称，由各自权利人拥有。
+
+由于产品版本升级或其他原因，本手册内容有可能变更。H3C保留在没有任何通知或者提示的情况下对本手册的内容进行修改的权利。本手册仅作为使用指导，H3C尽全力在本手册中提供准确的信息，但是 H3C 并不确保手册内容完全没有错误，本手册中的所有陈述、信息和建议也不构成任何明示或暗示的担保。
+
+[Context 5 | source=local | chunk_id=467914719130005118 | score=0.5800448059981075]
+## 1.1 概述
+
+H3C LA2608-GM/GU 室内无线网关（以下简称 LA2608）可以为用户提供无线服务，为了实现对设备的管理，LA2608需要通过 3G/4G网络连接到运营商无线控制器。
+
+![](images/16288d553bf867b279adb856534213ef37a0d17bdec59c9c4abf824878cd7e56.jpg)
+
+说明
+
+目前，LA2608只支持与 H3C公司的无线控制器互通。","配置 H3C LA2608 的 `dialer number` 拨号串前，应向**网络运营商**获取该拨号串。不同运营商的拨号串不同，手册明确提示：“不同运营商的拨号串不同，请用户在配置前向网络运营商获取发起呼叫的拨号串”。
+
+该设备手册示例中使用的拨号串是：`*99#`（带 `autodial` 参数，即 `dialer number *99# autodial`）。
+
+【图片】
+images/06474f326a73aa174281952c2d7a262f50b5a813a0a0523744c4cc52374ef0fd.jpg",0.8333333332916666,1.0,1.0,0.9570091343093191,0.9687239722700001
+H3C LA2608启用DNS解析、配置默认静态路由并指定运营商无线控制器IP地址分别使用什么命令？,启用DNS解析使用“dns resolve”；配置默认静态路由使用“ip route-static 0.0.0.0 0.0.0.0 Cellular-Ethernet2/0”；指定运营商无线控制器IP地址使用“wlan ac ip 60.191.99.143”。,"[Context 1 | source=local | chunk_id=467914719130005120 | score=0.9615854396502121]
+## 1.2.1 配置LA2608
+
+(1) 配置拨号访问组的拨号控制列表
+
+```txt
+<LA2608>system-view
+[LA2608]dialer-rule 1 ip permit
+(2) 配置 DCC 拨号
+```
+
+![](images/06474f326a73aa174281952c2d7a262f50b5a813a0a0523744c4cc52374ef0fd.jpg)
+
+dialer number命令用来配置发起呼叫的拨号串，不同运营商的拨号串不同，请用户在配置前向网络运营商获取发起呼叫的拨号串。
+
+```powershell
+[LA2608]interface Cellular-Ethernet2/0
+[LA2608-Cellular-Ethernet2/0]ip address cellular-allocated
+[LA2608-Cellular-Ethernet2/0]dialer enable-circular
+[LA2608-Cellular-Ethernet2/0]dialer-group 1
+[LA2608-Cellular-Ethernet2/0]dialer timer idle 0
+```
+
+```txt
+[LA2608-Cellular-Ethernet2/0]dialer timer autodial 5
+[LA2608-Cellular-Ethernet2/0]dialer number *99# autodial
+[LA2608-Cellular-Ethernet2/0]nat outbound
+[LA2608-Cellular-Ethernet2/0]quit
+
+(3) 配置 DNS 解析功能
+[LA2608]dns resolve
+
+(4) 配置静态路由
+[LA2608]ip route-static 0.0.0.0 0.0.0.0 Cellular-Ethernet2/0
+
+(5) 指定运营商无线控制器的 IP 地址
+[LA2608] wlan ac ip 60.191.99.143
+```
+
+## 1.2.2 配置运营商无线控制器
+
+![](images/08e8c1c7f9c7f47a615d8449dea68240baed840efe2f63d2a292dceb249bef98.jpg)
+
+## 说明
+
+如下配置仅供参考，运营商可根据实际情况进行调整。
+
+## (1) 创建业务 VLAN
+
+```txt
+(1) 创建业务 VLAN
+<AC>system-view
+[AC]vlan 2
+[AC-vlan2] quit
+(2) 创建 WLAN-ESS 接口并加入业务 VLAN
+[AC]interface WLAN-ESS 1
+[AC-WLAN-ESS1]port access vlan 2
+[AC-WLAN-ESS1]quit
+(3) 配置明文方式的服务模板
+[AC]wlan service-template 1 clear
+[AC-wlan-st-1]ssid ssidh3c
+[AC-wlan-st-1]bind WLAN-ESS 1
+[AC-wlan-st-1]service-template enable
+Please wait... Done.
+[AC-wlan-st-1]quit
+(4) 开启自动 AP 功能
+[AC]wlan auto-ap enable
+[AC]wlan ap 2608 model LA2608 id 1
+[AC-wlan-ap-2608]serial-id auto
+[AC-wlan-ap-2608]radio 1
+[AC-wlan-ap-2608-radio-1]service-template 1
+[AC-wlan-ap-2608-radio-1]radio enable
+[AC-wlan-ap-2608-radio-1]quit
+[AC-wlan-ap-2608]quit
+(5) 配置 VLAN 接口 IP 地址
+[AC]interface Vlan-interface 1
+[AC-Vlan-interface1]ip address 60.191.99.143 255.255.0.0
+[AC-Vlan-interface1]quit
+[AC]interface Vlan-interface 2
+[AC-Vlan-interface2]ip address 10.249.136.1 255.255.252.0
+[AC-Vlan-interface2]quit
+(6) 使能 DHCP 服务，配置 DHCP 地址池
+```
+
+[Context 2 | source=local | chunk_id=467914719130005116 | score=0.781827961076367]
+## 目 录
+
+1 H3C LA2608 室内无线网关用户手册 …… 1
+1.1 概述 …… 1
+1.2 配置LA2608与无线控制器互通 …… 1
+1.2.1 配置LA2608 …… 1
+1.2.2 配置运营商无线控制器 …… 2
+1.2.3 验证LA2608与无线控制器是否连通 …… 3
+
+[Context 3 | source=local | chunk_id=467914719130005118 | score=0.71491511502951]
+## 1.1 概述
+
+H3C LA2608-GM/GU 室内无线网关（以下简称 LA2608）可以为用户提供无线服务，为了实现对设备的管理，LA2608需要通过 3G/4G网络连接到运营商无线控制器。
+
+![](images/16288d553bf867b279adb856534213ef37a0d17bdec59c9c4abf824878cd7e56.jpg)
+
+说明
+
+目前，LA2608只支持与 H3C公司的无线控制器互通。","根据提供的资料，H3C LA2608设备执行以下三项配置所使用的命令如下：
+
+1. **启用DNS解析功能**：  
+   `dns resolve`
+
+2. **配置默认静态路由（指向Cellular-Ethernet2/0接口）**：  
+   `ip route-static 0.0.0.0 0.0.0.0 Cellular-Ethernet2/0`
+
+3. **指定运营商无线控制器的IP地址**：  
+   `wlan ac ip 60.191.99.143`
+
+> ⚠️ 注意：  
+> - `wlan ac ip` 命令中使用的 IP 地址 `60.191.99.143` 是参考内容中明确给出的示例值，实际部署时需按运营商要求配置对应无线控制器地址；  
+> - 所有命令均需在系统视图（`system-view`）下执行（除已注明在接口视图下的命令外）。
+
+【图片】
+images/06474f326a73aa174281952c2d7a262f50b5a813a0a0523744c4cc52374ef0fd.jpg",0.9999999999,1.0,0.5,0.9227347448216486,0.6930909740144632
+为H3C LA2608配置运营商无线控制器时，如何创建业务VLAN 2并将WLAN-ESS 1加入该VLAN？,在无线控制器系统视图执行“vlan 2”创建业务VLAN；随后进入“interface WLAN-ESS 1”，执行“port access vlan 2”，将WLAN-ESS 1加入业务VLAN 2。,"[Context 1 | source=local | chunk_id=467914719130005120 | score=0.9586951443011291]
+## 1.2.1 配置LA2608
+
+(1) 配置拨号访问组的拨号控制列表
+
+```txt
+<LA2608>system-view
+[LA2608]dialer-rule 1 ip permit
+(2) 配置 DCC 拨号
+```
+
+![](images/06474f326a73aa174281952c2d7a262f50b5a813a0a0523744c4cc52374ef0fd.jpg)
+
+dialer number命令用来配置发起呼叫的拨号串，不同运营商的拨号串不同，请用户在配置前向网络运营商获取发起呼叫的拨号串。
+
+```powershell
+[LA2608]interface Cellular-Ethernet2/0
+[LA2608-Cellular-Ethernet2/0]ip address cellular-allocated
+[LA2608-Cellular-Ethernet2/0]dialer enable-circular
+[LA2608-Cellular-Ethernet2/0]dialer-group 1
+[LA2608-Cellular-Ethernet2/0]dialer timer idle 0
+```
+
+```txt
+[LA2608-Cellular-Ethernet2/0]dialer timer autodial 5
+[LA2608-Cellular-Ethernet2/0]dialer number *99# autodial
+[LA2608-Cellular-Ethernet2/0]nat outbound
+[LA2608-Cellular-Ethernet2/0]quit
+
+(3) 配置 DNS 解析功能
+[LA2608]dns resolve
+
+(4) 配置静态路由
+[LA2608]ip route-static 0.0.0.0 0.0.0.0 Cellular-Ethernet2/0
+
+(5) 指定运营商无线控制器的 IP 地址
+[LA2608] wlan ac ip 60.191.99.143
+```
+
+## 1.2.2 配置运营商无线控制器
+
+![](images/08e8c1c7f9c7f47a615d8449dea68240baed840efe2f63d2a292dceb249bef98.jpg)
+
+## 说明
+
+如下配置仅供参考，运营商可根据实际情况进行调整。
+
+## (1) 创建业务 VLAN
+
+```txt
+(1) 创建业务 VLAN
+<AC>system-view
+[AC]vlan 2
+[AC-vlan2] quit
+(2) 创建 WLAN-ESS 接口并加入业务 VLAN
+[AC]interface WLAN-ESS 1
+[AC-WLAN-ESS1]port access vlan 2
+[AC-WLAN-ESS1]quit
+(3) 配置明文方式的服务模板
+[AC]wlan service-template 1 clear
+[AC-wlan-st-1]ssid ssidh3c
+[AC-wlan-st-1]bind WLAN-ESS 1
+[AC-wlan-st-1]service-template enable
+Please wait... Done.
+[AC-wlan-st-1]quit
+(4) 开启自动 AP 功能
+[AC]wlan auto-ap enable
+[AC]wlan ap 2608 model LA2608 id 1
+[AC-wlan-ap-2608]serial-id auto
+[AC-wlan-ap-2608]radio 1
+[AC-wlan-ap-2608-radio-1]service-template 1
+[AC-wlan-ap-2608-radio-1]radio enable
+[AC-wlan-ap-2608-radio-1]quit
+[AC-wlan-ap-2608]quit
+(5) 配置 VLAN 接口 IP 地址
+[AC]interface Vlan-interface 1
+[AC-Vlan-interface1]ip address 60.191.99.143 255.255.0.0
+[AC-Vlan-interface1]quit
+[AC]interface Vlan-interface 2
+[AC-Vlan-interface2]ip address 10.249.136.1 255.255.252.0
+[AC-Vlan-interface2]quit
+(6) 使能 DHCP 服务，配置 DHCP 地址池
+```
+
+[Context 2 | source=local | chunk_id=467914719130005116 | score=0.8105130031157847]
+## 目 录
+
+1 H3C LA2608 室内无线网关用户手册 …… 1
+1.1 概述 …… 1
+1.2 配置LA2608与无线控制器互通 …… 1
+1.2.1 配置LA2608 …… 1
+1.2.2 配置运营商无线控制器 …… 2
+1.2.3 验证LA2608与无线控制器是否连通 …… 3
+
+[Context 3 | source=web | url=https://zhiliao.h3c.com/questions/dispcont/314270 | score=0.7780193810362415]
+我得配置如下 IT钟点工 检查接入ap口是放行vlan 有飞不起的鸟 # 1. 创建WLAN服务模板 system-view wlan service-template 1 ssid H3C-WLAN client forwarding-location ap # 关键:配置为本地转发 vlan 100 # 客户端VLAN service-template enable quit # 2. 创建WLAN-ESS接口 interface WLAN-ESS 1 port access vlan 100 quit # 3. 配置AP模板 wlan ap ap1 model WA4320i-ACN serial-id 210235A1BSC123456789 # 配置Radio radio 1 service-template 1 channel 149 max-power 20 radio 2 service-template 1 channel 36 max-power 20 quit 叫我靓仔 参考配置举例: zhiliao_sEUyB 交换机要放行vlan的
+
+[Context 4 | source=local | chunk_id=467914719130005118 | score=0.771221529182126]
+## 1.1 概述
+
+H3C LA2608-GM/GU 室内无线网关（以下简称 LA2608）可以为用户提供无线服务，为了实现对设备的管理，LA2608需要通过 3G/4G网络连接到运营商无线控制器。
+
+![](images/16288d553bf867b279adb856534213ef37a0d17bdec59c9c4abf824878cd7e56.jpg)
+
+说明
+
+目前，LA2608只支持与 H3C公司的无线控制器互通。","根据提供的资料，为 H3C LA2608 配合运营商无线控制器（AC）使用时，创建业务 VLAN 2 并将 WLAN-ESS 1 接口加入该 VLAN 的配置步骤如下（该操作在**无线控制器（AC）上执行**，非 LA2608 本机）：
+
+1. 进入系统视图：  
+   `<AC> system-view`
+
+2. 创建 VLAN 2：  
+   `[AC] vlan 2`  
+   `[AC-vlan2] quit`
+
+3. 创建 WLAN-ESS 1 接口并将其以接入模式加入 VLAN 2：  
+   `[AC] interface WLAN-ESS 1`  
+   `[AC-WLAN-ESS1] port access vlan 2`  
+   `[AC-WLAN-ESS1] quit`
+
+> ⚠️ 注意：此配置属于“1.2.2 配置运营商无线控制器”部分，适用于与 LA2608 互通的 H3C 无线控制器（AC），且资料明确说明 LA2608 **只支持与 H3C 公司的无线控制器互通**。
+
+【图片】  
+images/08e8c1c7f9c7f47a615d8449dea68240baed840efe2f63d2a292dceb249bef98.jpg",0.8333333332916666,1.0,1.0,0.9577305758512251,0.7339507906842557
+为H3C LA2608配置明文服务模板1时，手册指定的SSID是什么，关键配置命令有哪些？,手册指定的SSID为ssidh3c。关键命令为“wlan service-template 1 clear”、“ssid ssidh3c”、“bind WLAN-ESS 1”和“service-template enable”。,"[Context 1 | source=local | chunk_id=467914719130005120 | score=0.8695368515435393]
+## 1.2.1 配置LA2608
+
+(1) 配置拨号访问组的拨号控制列表
+
+```txt
+<LA2608>system-view
+[LA2608]dialer-rule 1 ip permit
+(2) 配置 DCC 拨号
+```
+
+![](images/06474f326a73aa174281952c2d7a262f50b5a813a0a0523744c4cc52374ef0fd.jpg)
+
+dialer number命令用来配置发起呼叫的拨号串，不同运营商的拨号串不同，请用户在配置前向网络运营商获取发起呼叫的拨号串。
+
+```powershell
+[LA2608]interface Cellular-Ethernet2/0
+[LA2608-Cellular-Ethernet2/0]ip address cellular-allocated
+[LA2608-Cellular-Ethernet2/0]dialer enable-circular
+[LA2608-Cellular-Ethernet2/0]dialer-group 1
+[LA2608-Cellular-Ethernet2/0]dialer timer idle 0
+```
+
+```txt
+[LA2608-Cellular-Ethernet2/0]dialer timer autodial 5
+[LA2608-Cellular-Ethernet2/0]dialer number *99# autodial
+[LA2608-Cellular-Ethernet2/0]nat outbound
+[LA2608-Cellular-Ethernet2/0]quit
+
+(3) 配置 DNS 解析功能
+[LA2608]dns resolve
+
+(4) 配置静态路由
+[LA2608]ip route-static 0.0.0.0 0.0.0.0 Cellular-Ethernet2/0
+
+(5) 指定运营商无线控制器的 IP 地址
+[LA2608] wlan ac ip 60.191.99.143
+```
+
+## 1.2.2 配置运营商无线控制器
+
+![](images/08e8c1c7f9c7f47a615d8449dea68240baed840efe2f63d2a292dceb249bef98.jpg)
+
+## 说明
+
+如下配置仅供参考，运营商可根据实际情况进行调整。
+
+## (1) 创建业务 VLAN
+
+```txt
+(1) 创建业务 VLAN
+<AC>system-view
+[AC]vlan 2
+[AC-vlan2] quit
+(2) 创建 WLAN-ESS 接口并加入业务 VLAN
+[AC]interface WLAN-ESS 1
+[AC-WLAN-ESS1]port access vlan 2
+[AC-WLAN-ESS1]quit
+(3) 配置明文方式的服务模板
+[AC]wlan service-template 1 clear
+[AC-wlan-st-1]ssid ssidh3c
+[AC-wlan-st-1]bind WLAN-ESS 1
+[AC-wlan-st-1]service-template enable
+Please wait... Done.
+[AC-wlan-st-1]quit
+(4) 开启自动 AP 功能
+[AC]wlan auto-ap enable
+[AC]wlan ap 2608 model LA2608 id 1
+[AC-wlan-ap-2608]serial-id auto
+[AC-wlan-ap-2608]radio 1
+[AC-wlan-ap-2608-radio-1]service-template 1
+[AC-wlan-ap-2608-radio-1]radio enable
+[AC-wlan-ap-2608-radio-1]quit
+[AC-wlan-ap-2608]quit
+(5) 配置 VLAN 接口 IP 地址
+[AC]interface Vlan-interface 1
+[AC-Vlan-interface1]ip address 60.191.99.143 255.255.0.0
+[AC-Vlan-interface1]quit
+[AC]interface Vlan-interface 2
+[AC-Vlan-interface2]ip address 10.249.136.1 255.255.252.0
+[AC-Vlan-interface2]quit
+(6) 使能 DHCP 服务，配置 DHCP 地址池
+```
+
+[Context 2 | source=local | chunk_id=467914719130005116 | score=0.7609033896409895]
+## 目 录
+
+1 H3C LA2608 室内无线网关用户手册 …… 1
+1.1 概述 …… 1
+1.2 配置LA2608与无线控制器互通 …… 1
+1.2.1 配置LA2608 …… 1
+1.2.2 配置运营商无线控制器 …… 2
+1.2.3 验证LA2608与无线控制器是否连通 …… 3
+
+[Context 3 | source=web | url=https://www.h3c.com/cn/Service/Document_Software/Document_Center/Routers/Catalog/LA_wireless/H3C_LA2608/Default.htm | score=0.6423471034373749]
+H3C LA2608 室内型无线网关 Aolynk产品 Aolynk产品 如何购买 案例中心New 数字化领航直播间 云上展厅 新华三商城 H3C LA2608 室内型无线网关 订阅 阅读量 评分 时间 选择版本 全部版本 订阅 快速安装指南 H3C LA2608室内无线网关 快速安装指南-AP101 2014-03-03 类型:快速安装指南 安装指导 H3C 设备防雷安装指导手册(V1.02) 2021-10-20 类型:安装指导 安全和兼容性手册 H3C LA2608室内无线网关安全兼容性手册-6W103 2017-04-14 类型:安全和兼容性手册 License指南 H3C 交换机及路由器产品 通用License使用指南-6W107 2026-07-27 类型:License指南 用户手册 H3C LA2608室内无线网关 用户手册-6W100 2014-03-03 类型:用户手册 H3C个人资料库 H3C个人资料库 2022-01-29 类型:H3C个人资料库
+
+[Context 4 | source=local | chunk_id=467914719130005118 | score=0.6268546863941606]
+## 1.1 概述
+
+H3C LA2608-GM/GU 室内无线网关（以下简称 LA2608）可以为用户提供无线服务，为了实现对设备的管理，LA2608需要通过 3G/4G网络连接到运营商无线控制器。
+
+![](images/16288d553bf867b279adb856534213ef37a0d17bdec59c9c4abf824878cd7e56.jpg)
+
+说明
+
+目前，LA2608只支持与 H3C公司的无线控制器互通。
+
+[Context 5 | source=web | url=https://www.h3c.com/cn/Service/Document_Software/Document_Center/Home/Security/00-Public/Command/Command_Manual/H3C_SecPath_F5000_AI_X5_G_CR_E9900-17766/01/?CHID=1306922 | score=0.595044689928128]
+01-基础配置命令参考 发布时间: 浏览量: 1676 下载量: 72
+
+[Context 6 | source=local | chunk_id=467914719130005115 | score=0.5815013191619657]
+# H3C LA2608 室内无线网关
+
+用户手册
+
+Copyright © 2014 杭州华三通信技术有限公司及其许可者 版权所有，保留一切权利。
+
+未经本公司书面许可，任何单位和个人不得擅自摘抄、复制本书内容的部分或全部，并不得以任何形式传播。
+
+H3C、 、Aolynk、 Aolynk 、H<sup>3</sup>Care、 Heare TOP G, TOPG IRF、NetPilot、Neocean、NeoVTL、SecPro、SecPoint、SecEngine、SecPath、Comware、Secware、Storware、NQA、VVG、V<sup>2</sup>G、V<sup>n</sup>G、PSPT、XGbus、N-Bus、TiGem、InnoVision、HUASAN、华三均为杭州华三通信技术有限公司的商标。对于本手册中出现的其它公司的商标、产品标识及商品名称，由各自权利人拥有。
+
+由于产品版本升级或其他原因，本手册内容有可能变更。H3C保留在没有任何通知或者提示的情况下对本手册的内容进行修改的权利。本手册仅作为使用指导，H3C尽全力在本手册中提供准确的信息，但是 H3C 并不确保手册内容完全没有错误，本手册中的所有陈述、信息和建议也不构成任何明示或暗示的担保。
+
+[Context 7 | source=web | url=https://www.h3c.com/cn/d_202603/2789624_30005_0.htm | score=0.48501830308913696]
+01-基础配置命令参考 H3C MSR610[810][830][1000S][2600][3600]路由器 命令参考(V7)-R6749-6W111 01-基础配置命令参考
+
+[Context 8 | source=web | url=https://blog.csdn.net/weixin_34101784/article/details/93126724 | score=0.47182282078541987]
+干了十几年网络运维,从机房里摸爬滚打出来,我最大的感触就是:命令是网工的“武器库”。无论是华为、H3C还是锐捷的交换机,你面对的设备品牌可能五花八门,但核心任务无非就是让网络通、稳、快。新手入行最头疼的,往往不是理论不懂,而是面对一台陌生的设备命令行,不知道从何敲起,或者记不住那条关键的救命命令。老手偶尔也会遇到需要临时配置一个不常用功能,命令在嘴边却怎么也想不全的情况。 这份“华为、H3C、锐捷交换机常用配置命令汇总大全”,就是为解决这个痛点而生的。它不是一本死板的命令字典,而是我结合多年项目实战、排错经历,从海量配置中提炼出的“高频场景命令集”。它的核心价值在于:当你遇到一个具体的网络需求时,能快速找到对应品牌设备的正确配置命令和步骤,避免在手册里大海捞针,提升配置效率和准确性。无论是网络初学者用于系统学习命令逻辑,还是资深工程师作为随身速查手册,它都能提供直接的帮助。本文将不仅罗列命令,更会深入讲解命令背后的使用场景、配置逻辑以及那些容易踩坑的细节,让你真正理解并掌握这些命令。 虽然华为(Huawei)、H3C(新华三)和锐捷(Ruijie)的交换机在细节和部分高级功能上各有特色,但它们都源自类似的网络体系(早期与思科有渊源,后各自发展),因此在基础命令框架上存在大量的相似性和规律性。理解这个框架,是高效学习和记忆命令的关键。 2.1 配置模式导航:找到你的“工作台” 所有操作都始于正确的配置模式。你可以把交换机的命令行界面想象成一个有多层房间的办公楼,不同的模式允许你在不同的房间进行不同类型的装修(配置)。 华为/H3C设备: 用户视图:<Huawei>或<H3C>。这是你登录后进入的第一个“大厅”。在这里,你只能执行一些查看状态、测试连通性的命令(如ping,display version),不能进行配置。 系统视图:在用户视图下输入system-view(可简写为sys)。提示符变为[Huawei]或[H3C]。这是最主要的“配置车间”,大部分全局参数(如设备名、VLAN、路由协议)都在这里设置。 接口视图:在系统视图下输入interface interface-type interface-number(例如interface GigabitEthernet 0/0/1)。提示符变为[Huawei-GigabitEthernet0/0/1]。这是针对某个具体端口的“精细操作间”,在这里配置IP地址、速率、VLAN成员关系等。 VLAN视图:在系统视图下输入vlan vlan-id(例如vlan 10)。
+
+[Context 9 | source=local | chunk_id=467914719130005119 | score=0.44639103850292305]
+## 1.2 配置LA2608与无线控制器互通
+
+如 图 1 所示，LA2608 安装了SIM卡，通过 3G/4G网络连接到运营商无线控制器，并向用户提供无线服务。关于LA2608的安装方法，请参见“H3C LA2608室内无线网关 快速安装指南”。
+
+图1 配置 LA2608与无线控制器互通
+
+![](images/2436b496658837dfc940d48d8565fa9a9135932ebf6e2c2a25e9fff4f674dd39.jpg)
+
+[Context 10 | source=web | url=https://zhuanlan.zhihu.com/p/2037907218973070588 | score=0.43869437229569164]
+三大主流的常用基础配置命令,适合网络新手入门学习,快速上手基础设备操作。 一、华为交换机配置命令 二、H3C 交换机配置命令 三、 锐捷交换机 配置命令 注意事项 1、看好命令提示符,不同模式能使用的命令不一样。 2、配置完成一定要保存,不然设备重启所有设置都会清空。 3、命令后面加个?就能查看可用命令和参数。 4、改完配置多用查看命令核对,确认设置正常生效。 5、定时导出设备配置保存好,出问题可以快速恢复。 6、重启前要保存配置,避开业务时段,避免网络中断。 一、华为交换机配置命令","根据提供的资料，为 H3C LA2608 配置明文服务模板 1 时：
+
+- **手册指定的SSID是 `ssidh3c`**。  
+  依据【参考内容】[1]中“1.2.2 配置运营商无线控制器”部分第(3)步：  
+  ```txt
+  [AC]wlan service-template 1 clear
+  [AC-wlan-st-1]ssid ssidh3c
+  ```
+
+- **关键配置命令如下（按执行顺序）：**  
+  1. 创建 WLAN 服务模板并设为明文模式：  
+     `wlan service-template 1 clear`  
+  2. 配置 SSID 名称：  
+     `ssid ssidh3c`  
+  3. 将服务模板绑定到 WLAN-ESS 接口（此前已创建 WLAN-ESS 1）：  
+     `bind WLAN-ESS 1`  
+  4. 启用该服务模板：  
+     `service-template enable`  
+
+> ⚠️ 注意：该配置是在**运营商无线控制器（AC）** 上执行的，不是在 LA2608 本体上配置。LA2608 作为 AP，由 AC 统一管理并自动下发配置。
+
+【图片】  
+images/08e8c1c7f9c7f47a615d8449dea68240baed840efe2f63d2a292dceb249bef98.jpg",0.9999999999,1.0,0.6923076923076923,0.9032067806944651,0.6455215019398194
+在无线控制器上为H3C LA2608开启自动AP功能并启用射频1时需要执行哪些关键命令？,依次执行“wlan auto-ap enable”、“wlan ap 2608 model LA2608 id 1”、“serial-id auto”、“radio 1”、“service-template 1”和“radio enable”。,"[Context 1 | source=local | chunk_id=467914719130005120 | score=0.8195060980975755]
+## 1.2.1 配置LA2608
+
+(1) 配置拨号访问组的拨号控制列表
+
+```txt
+<LA2608>system-view
+[LA2608]dialer-rule 1 ip permit
+(2) 配置 DCC 拨号
+```
+
+![](images/06474f326a73aa174281952c2d7a262f50b5a813a0a0523744c4cc52374ef0fd.jpg)
+
+dialer number命令用来配置发起呼叫的拨号串，不同运营商的拨号串不同，请用户在配置前向网络运营商获取发起呼叫的拨号串。
+
+```powershell
+[LA2608]interface Cellular-Ethernet2/0
+[LA2608-Cellular-Ethernet2/0]ip address cellular-allocated
+[LA2608-Cellular-Ethernet2/0]dialer enable-circular
+[LA2608-Cellular-Ethernet2/0]dialer-group 1
+[LA2608-Cellular-Ethernet2/0]dialer timer idle 0
+```
+
+```txt
+[LA2608-Cellular-Ethernet2/0]dialer timer autodial 5
+[LA2608-Cellular-Ethernet2/0]dialer number *99# autodial
+[LA2608-Cellular-Ethernet2/0]nat outbound
+[LA2608-Cellular-Ethernet2/0]quit
+
+(3) 配置 DNS 解析功能
+[LA2608]dns resolve
+
+(4) 配置静态路由
+[LA2608]ip route-static 0.0.0.0 0.0.0.0 Cellular-Ethernet2/0
+
+(5) 指定运营商无线控制器的 IP 地址
+[LA2608] wlan ac ip 60.191.99.143
+```
+
+## 1.2.2 配置运营商无线控制器
+
+![](images/08e8c1c7f9c7f47a615d8449dea68240baed840efe2f63d2a292dceb249bef98.jpg)
+
+## 说明
+
+如下配置仅供参考，运营商可根据实际情况进行调整。
+
+## (1) 创建业务 VLAN
+
+```txt
+(1) 创建业务 VLAN
+<AC>system-view
+[AC]vlan 2
+[AC-vlan2] quit
+(2) 创建 WLAN-ESS 接口并加入业务 VLAN
+[AC]interface WLAN-ESS 1
+[AC-WLAN-ESS1]port access vlan 2
+[AC-WLAN-ESS1]quit
+(3) 配置明文方式的服务模板
+[AC]wlan service-template 1 clear
+[AC-wlan-st-1]ssid ssidh3c
+[AC-wlan-st-1]bind WLAN-ESS 1
+[AC-wlan-st-1]service-template enable
+Please wait... Done.
+[AC-wlan-st-1]quit
+(4) 开启自动 AP 功能
+[AC]wlan auto-ap enable
+[AC]wlan ap 2608 model LA2608 id 1
+[AC-wlan-ap-2608]serial-id auto
+[AC-wlan-ap-2608]radio 1
+[AC-wlan-ap-2608-radio-1]service-template 1
+[AC-wlan-ap-2608-radio-1]radio enable
+[AC-wlan-ap-2608-radio-1]quit
+[AC-wlan-ap-2608]quit
+(5) 配置 VLAN 接口 IP 地址
+[AC]interface Vlan-interface 1
+[AC-Vlan-interface1]ip address 60.191.99.143 255.255.0.0
+[AC-Vlan-interface1]quit
+[AC]interface Vlan-interface 2
+[AC-Vlan-interface2]ip address 10.249.136.1 255.255.252.0
+[AC-Vlan-interface2]quit
+(6) 使能 DHCP 服务，配置 DHCP 地址池
+```
+
+[Context 2 | source=web | url=https://www.h3c.com/cn/d_202301/1763746_30005_0.htm | score=0.7164707587940258]
+05-H3C无线控制器开启自动AP功能建立CAPWAP隧道配置举例 H3C 无线控制器开启自动AP功能建立CAPWAP隧道配置举例 目录 1 简介 2 特性使用指南 2.1 使用场合 2.2 配置前提 3 配置举例 3.1 组网需求 3.2 配置AC 3.3 验证结果 4 相关资料 1 简介 本文档介绍开启自动AP功能与AC建立CAPWAP隧道连接的配置举例。 2 特性使用指南 2.1 使用场合 当无线网络中部署的AP数量较多时,开启自动AP功能可以简化配置,即AC上可以不创建手工AP。 2.2 配置前提 本文档不严格与具体软、硬件版本对应,如果使用过程中与产品实际情况有差异,请以设备实际情况为准。 本文档中的配置均是在实验室环境下进行的配置和验证,配置前设备的所有参数均采用出厂时的缺省配置。如果您已经对设备进行了配置,为了保证配置效果,请确认现有配置和以下举例中的配置不冲突。 3 配置举例 3.1 组网需求 如图1 所示,AP和AC通过交换机相连,在AC上开启自动AP功能,AC作为DHCP服务器为AP提供DHCP服务。MAC地址为70ba-ef07-c560的AP通过DHCP选项方式从DHCP服务器上获取AP和AC的IP地址,发现AC并与AC建立CAPWAP隧道连接。 图1 开启自动AP 功能建立CAPWAP隧道组网图 3.2 配置AC 1. 配置AC的IP地址 (1) 点击页面底部的<系统>按钮,进入“系统”菜单页面。 (2) 点击页面左侧导航栏的[网络配置/VLAN],进入“VLAN”配置页面: ¡ 点击“ ”按钮创建VLAN10; 图2 创建VLAN ¡ 点击已创建的VLAN10的编辑按钮“ ”,添加Untagged端口列表; 图3 添加物理接口 ¡ 勾选“创建VLAN接口”,并配置IPv4地址为192.168.1.1/24。 图4 创建并配置VLAN接口地址 2. 配置DHCP服务 (1) 点击页面底部的<系统>按钮,进入“系统”菜单页面。 (2) 点击页面左侧导航栏的[网络配置/服务/[DHCP/DNS]],进入“DHCP”页面配置DHCP服务,配置如下: ¡ 点击<启用DHCP>按钮,开启DHCP服务; ¡ 配置VLAN接口10工作在DHCP服务器模式; ¡ 点击页面右上角的<地址池>按钮,进入“修改DHCP服务器地址池”页面,点击<添加地址池>按钮,创建名称为pool1的地址池,在“地址分配”页面配置该地址池动态分配的地址段为192.168.1.0/24; 图5 配置DHCP地址池 ¡ 进入“地址池选项”页面,配置网关地址为192.168.1.1,配置DHCP选项43为客户端分配AC的IP地址,选项类型为十六进制数串,内容为8007000001c0a80101。 图6 配置DHCP选项43 3. 开启自动AP功能 (1) 点击页面底部的 <网络>按钮,进入“网络”菜单页面。
+
+[Context 3 | source=local | chunk_id=467914719130005118 | score=0.6812253923944399]
+## 1.1 概述
+
+H3C LA2608-GM/GU 室内无线网关（以下简称 LA2608）可以为用户提供无线服务，为了实现对设备的管理，LA2608需要通过 3G/4G网络连接到运营商无线控制器。
+
+![](images/16288d553bf867b279adb856534213ef37a0d17bdec59c9c4abf824878cd7e56.jpg)
+
+说明
+
+目前，LA2608只支持与 H3C公司的无线控制器互通。
+
+[Context 4 | source=local | chunk_id=467914719130005116 | score=0.6509774309188737]
+## 目 录
+
+1 H3C LA2608 室内无线网关用户手册 …… 1
+1.1 概述 …… 1
+1.2 配置LA2608与无线控制器互通 …… 1
+1.2.1 配置LA2608 …… 1
+1.2.2 配置运营商无线控制器 …… 2
+1.2.3 验证LA2608与无线控制器是否连通 …… 3
+
+[Context 5 | source=web | url=https://blog.csdn.net/weixin_45642360/article/details/147880644 | score=0.603615398691232]
+H3C华三配置AC自动上线AP 三、配置自动AP 四、S1配置,做地址池和网关 五、S3配置,主要放通各类vlan 六、接入层交换机:放通各类vlan和为ap端打上管理vlan。 一、网络拓扑 管理vlan100流量路径:ap1——接入交换机——s3——s1——ac 业务vlan200流量路径:ap1——接入交换机——s3——s1——防火墙 (可做vrrp虚拟网关,s1和s2出) 二、AC配置 [AC]dis cur # version 7.1.064, Alpha 7165 # sysname AC # dhcp enable # vlan 1 # vlan 100 # vlan 200 # dhcp server ip-pool vlan100 #dhcp不一定放ac可以放S1交换机或其他 gateway-list 192.168.100.254 network 192.168.100.0 mask 255.255.255.0 option 43 ip-address 192.168.100.1 #指向ac的IP地址,重要。 # dhcp server ip-pool vlan200 gateway-list 192.168.200.254 network 192.168.200.0 mask 255.255.255.0 # wlan service-template 1 #没配置wifi认证方式,不需要输密码。 ssid guli #ap信号名称 vlan 200 #获取vlan200的地址池,200.0网段ip service-template enable # interface Vlan-interface100 ip address 192.168.100.1 255.255.255.0 # interface Vlan-interface200 ip address 192.168.200.1 255.255.255.0 # interface GigabitEthernet1/0/1 port link-mode bridge port link-type trunk port trunk permit vlan 1 100 200 combo enable fiber # ip route-static 0.0.0.0 0 192.168.100.254 ip route-static 0.0.0.0 0 192.168.200.254 # wlan auto-ap enable #自动ap上线,全部上线后应关闭 wlan auto-persistent enable #自动ap固化 # wlan ap-group group1 #建立ap组,组名为group1,统一管理ap vlan 1 ap ap1 ap ap2 ap ap3 ap-model WA6320-HCL radio 1 #2.4g radio enable service-template 1 #使用模版1 radio 2 #5G radio enable service-template 1 gigabitethernet 1 #以下为自动上线及固化的ap不需要配置 wlan ap ap1 model WA6320-HCL serial-id H3C_90-E5-C3-55-18-00 vlan 1 radio 1 radio 2 gigabitethernet 1 # wlan ap ap2 model WA6320-HCL serial-id H3C_90-88-83-B5-13-00 vlan 1 radio 1 radio 2 gigabitethernet 1 # wlan ap ap3 model WA6320-HCL serial-id H3C_90-E5-CF-78-1D-00 vlan 1 radio 1 radio 2 gigabitethernet 1
+
+[Context 6 | source=local | chunk_id=467914719130005121 | score=0.5292850864753953]
+## 1.2.1 配置LA2608
+
+```txt
+[AC]dhcp enable
+[AC]dhcp server ip-pool vlan2
+[AC-dhcp-pool-vlan1]network 10.249.136.0 22
+[AC-dhcp-pool-vlan1]gateway-list 10.249.136.1
+[AC-dhcp-pool-vlan1]dns-list 218.201.96.130
+[AC-dhcp-pool-vlan1]quit
+```
+
+## 1.2.3 验证LA2608 与无线控制器是否连通
+
+在无线控制器上执行 display wlan ap 命令，state 字段显示为“R/M”，表示 LA2608 与无线控制器之间已经建立连接。
+
+```txt
+<Sysname> display wlan ap all
+Total Number of APs configured : 1
+Total Number of configured APs connected : 1
+Total Number of auto APs connected : 0
+AP Profiles
+State : I = Idle, J = Join, JA = JoinAck, IL = ImageLoad
+C = Config, R = Run, KU = KeyUpdate, KC = KeyCfm
+M = Master, B = Backup
+```
+
+```csv
+AP Name State Model Serial-ID
+ap1 R/M LA2608 036286A054000033
+```
+
+[Context 7 | source=web | url=https://www.h3c.com/cn/d_202412/2333527_30005_0.htm | score=0.4872303533593552]
+06-AP管理命令参考 01-AP管理命令 01-AP管理命令 目录 1 AP管理 1.1 AP管理配置命令‌ 1.1.1 ap-mode 1.1.2 display wlan ap-tag 1.1.3 poe port 1.1.4 region-code 1.1.5 region-code-ie 1.1.6 region-code-lock 1.1.7 usb 1.1.8 wlan ap-tag 1.1.9 wlan led-mode 1.1.10 wlan power-level 1 AP管理
+
+[Context 8 | source=local | chunk_id=467914719130005119 | score=0.45780553780463124]
+## 1.2 配置LA2608与无线控制器互通
+
+如 图 1 所示，LA2608 安装了SIM卡，通过 3G/4G网络连接到运营商无线控制器，并向用户提供无线服务。关于LA2608的安装方法，请参见“H3C LA2608室内无线网关 快速安装指南”。
+
+图1 配置 LA2608与无线控制器互通
+
+![](images/2436b496658837dfc940d48d8565fa9a9135932ebf6e2c2a25e9fff4f674dd39.jpg)
+
+[Context 9 | source=web | url=https://wwwsg.h3c.com/cn/d_202511/2693718_30005_0.htm | score=0.42865111132767864]
+02-AP管理命令 目录 1 AP管理 1.1 AP管理配置命令 1.1.1 ap (AP group view) 1.1.2 ap (vip-ap-group) 1.1.3 ap-model 1.1.4 ap-tag 1.1.5 data-tunnel encryption 1.1.6 delete file 1.1.7 description (AP/Virtual-AP group view) 1.1.8 description (AP/Virtual-AP view) 1.1.9 discovery-response 1.1.10 display wlan ap 1.1.11 display wlan ap address 1.1.12 display wlan ap all feature capwap 1.1.13 display wlan ap ap-tag 1.1.14 display wlan ap connection-record 1.1.15 display wlan ap files 1.1.16 display wlan ap group 1.1.17 display wlan ap interface 1.1.18 display wlan ap online-time 1.1.19 display wlan ap reboot-log 1.1.20 display wlan ap region-code 1.1.21 display wlan ap running-configuration 1.1.22 display wlan ap statistics association-failure-record 1.1.23 display wlan ap statistics image-download 1.1.24 display wlan ap statistics switch-over-record 1.1.25 display wlan ap statistics online-record 1.1.26 display wlan ap statistics tunnel-down-record 1.1.27 display wlan ap total-online-duration 1.1.28 display wlan ap-group 1.1.29 display wlan ap-model 1.1.30 display wlan license 1.1.31 display wlan virtual-ap 1.1.32 display wlan virtual-ap-group 1.1.33 download file 1.1.34 echo-count 1.1.35 echo-interval 1.1.36 firmware-upgrade 1.1.37 fragment-size 1.1.38 gigabitethernet 1.1.39 hybrid-remote-ap enable 1.1.40 if-match ip 1.1.41 if-match ipv6 1.1.42 keepalive-interval 1.1.43 led-mode 1.1.44 mac-address (AP/Virtual-AP group view) 1.1.45 mac-address (AP/Virtual-AP view) 1.1.46 map-configuration 1.1.47 priority 1.1.48 region-code (AP/AP group view) 1.1.49 region-code (Gobal configuration view) 1.1.50 region-code-ie 1.1.51 region-code-lock 1.1.52 report-interval 1.1.53 reset wlan ap 1.1.54 reset wlan ap connection-record 1.1.55 reset wlan ap reboot-log 1.1.56 retransmit-count 1.1.57 retransmit-interval 1.1.58 serial-id (AP/Virtual-AP group view)
+
+[Context 10 | source=web | url=https://www.h3c.com/cn/d_202312/1989440_30005_0.htm | score=0.41414578877941943]
+1.1 AP管理配置命令 1.1.1 wlan power-level 1 AP管理 1.1 AP 管理配置命令 1.1.1 wlan power-level wlan power-level 命令用来配置AP的缺省供电等级。 undo wlan power-level 命令用来恢复缺省情况。 【命令】 wlan power-level default { high | low | middle } undo wlan power-level default 【缺省情况】 AP的缺省供电等级为中。 【视图】 系统视图 【缺省用户角色】 network-admin 【参数】 high :缺省供电等级为高。 low :缺省供电等级为低。 middle :缺省供电等级为中。 【使用指导】 AP供电等级分为高、中、低三种。AP启动后会自动向上游交换机学习供电等级,若AP无法从上游交换机获取到供电等级,用户可以手动设置供电等级。 表1-1 AP的供电模式与供电等级对应关系 <table><tr><th>供电模式</th><th>供电等级</th></tr><tr><td>电源适配器供电 多个PoE+供电 PoE与PoE+混合供电</td><td>高</td></tr><tr><td>单个PoE+供电 多个PoE供电</td><td>中</td></tr><tr><td>单个PoE供电</td><td>低</td></tr></table> 不同供电等级下,AP对于MIMO的支持情况不同,如表1-2 所示。 表1-2 MIMO 模式的支持情况 <table><tr><th>供电等级</th><th>MIMO数</th></tr><tr><td>高</td><td>1x1、2x2、3x3、4x4</td></tr><tr><td>中</td><td>1x1、2x2、3x3、4x4</td></tr><tr><td>低</td><td>1x1</td></tr></table> ‌ 如果设备可以自动识别供电等级,不建议配置该命令。 【举例】 # 配置AP的缺省供电等级为低。 <Sysname> system-view [Sysname] wlan power-level default low","在无线控制器（AC）上为 H3C LA2608 开启自动 AP 功能并启用射频 1，需执行以下关键命令（依据【参考内容】[1] 中“1.2.2 配置运营商无线控制器”部分）：
+
+1. 启用自动 AP 功能：  
+   ```txt
+   [AC] wlan auto-ap enable
+   ```
+
+2. 创建 LA2608 对应的 AP 实例（指定型号、ID）：  
+   ```txt
+   [AC] wlan ap 2608 model LA2608 id 1
+   ```
+
+3. 配置 AP 的序列号自动生成（适配自动上线）：  
+   ```txt
+   [AC-wlan-ap-2608] serial-id auto
+   ```
+
+4. 进入射频 1 视图并启用：  
+   ```txt
+   [AC-wlan-ap-2608] radio 1
+   [AC-wlan-ap-2608-radio-1] radio enable
+   ```
+
+5. 将射频 1 绑定至已配置的服务模板（如服务模板 1）：  
+   ```txt
+   [AC-wlan-ap-2608-radio-1] service-template 1
+   ```
+
+> ⚠️ 注意：  
+> - 服务模板 1 需提前创建并启用（如 `wlan service-template 1 clear`、配置 SSID、绑定 WLAN-ESS 接口、执行 `service-template enable`）；  
+> - 上述命令中 `wlan ap 2608` 的名称（`2608`）和 `id 1` 为示例，实际可按需命名，但 `model LA2608` 必须准确匹配设备型号；  
+> - 射频启用前，确保该 AP 已成功上线（state 显示为 `R/M`），可通过 `display wlan ap all` 验证。
+
+【图片】  
+images/08e8c1c7f9c7f47a615d8449dea68240baed840efe2f63d2a292dceb249bef98.jpg",0.699999999965,1.0,,0.9797211974505142,0.7563322762405906
+H3C LA2608示例中的DHCP地址池使用什么网段、网关和DNS服务器？,DHCP地址池使用网段10.249.136.0/22，网关为10.249.136.1，DNS服务器为218.201.96.130。,"[Context 1 | source=local | chunk_id=467914719130005121 | score=0.8902781193431957]
+## 1.2.1 配置LA2608
+
+```txt
+[AC]dhcp enable
+[AC]dhcp server ip-pool vlan2
+[AC-dhcp-pool-vlan1]network 10.249.136.0 22
+[AC-dhcp-pool-vlan1]gateway-list 10.249.136.1
+[AC-dhcp-pool-vlan1]dns-list 218.201.96.130
+[AC-dhcp-pool-vlan1]quit
+```
+
+## 1.2.3 验证LA2608 与无线控制器是否连通
+
+在无线控制器上执行 display wlan ap 命令，state 字段显示为“R/M”，表示 LA2608 与无线控制器之间已经建立连接。
+
+```txt
+<Sysname> display wlan ap all
+Total Number of APs configured : 1
+Total Number of configured APs connected : 1
+Total Number of auto APs connected : 0
+AP Profiles
+State : I = Idle, J = Join, JA = JoinAck, IL = ImageLoad
+C = Config, R = Run, KU = KeyUpdate, KC = KeyCfm
+M = Master, B = Backup
+```
+
+```csv
+AP Name State Model Serial-ID
+ap1 R/M LA2608 036286A054000033
+```
+
+[Context 2 | source=local | chunk_id=467914719130005120 | score=0.7163390087287778]
+## 1.2.1 配置LA2608
+
+(1) 配置拨号访问组的拨号控制列表
+
+```txt
+<LA2608>system-view
+[LA2608]dialer-rule 1 ip permit
+(2) 配置 DCC 拨号
+```
+
+![](images/06474f326a73aa174281952c2d7a262f50b5a813a0a0523744c4cc52374ef0fd.jpg)
+
+dialer number命令用来配置发起呼叫的拨号串，不同运营商的拨号串不同，请用户在配置前向网络运营商获取发起呼叫的拨号串。
+
+```powershell
+[LA2608]interface Cellular-Ethernet2/0
+[LA2608-Cellular-Ethernet2/0]ip address cellular-allocated
+[LA2608-Cellular-Ethernet2/0]dialer enable-circular
+[LA2608-Cellular-Ethernet2/0]dialer-group 1
+[LA2608-Cellular-Ethernet2/0]dialer timer idle 0
+```
+
+```txt
+[LA2608-Cellular-Ethernet2/0]dialer timer autodial 5
+[LA2608-Cellular-Ethernet2/0]dialer number *99# autodial
+[LA2608-Cellular-Ethernet2/0]nat outbound
+[LA2608-Cellular-Ethernet2/0]quit
+
+(3) 配置 DNS 解析功能
+[LA2608]dns resolve
+
+(4) 配置静态路由
+[LA2608]ip route-static 0.0.0.0 0.0.0.0 Cellular-Ethernet2/0
+
+(5) 指定运营商无线控制器的 IP 地址
+[LA2608] wlan ac ip 60.191.99.143
+```
+
+## 1.2.2 配置运营商无线控制器
+
+![](images/08e8c1c7f9c7f47a615d8449dea68240baed840efe2f63d2a292dceb249bef98.jpg)
+
+## 说明
+
+如下配置仅供参考，运营商可根据实际情况进行调整。
+
+## (1) 创建业务 VLAN
+
+```txt
+(1) 创建业务 VLAN
+<AC>system-view
+[AC]vlan 2
+[AC-vlan2] quit
+(2) 创建 WLAN-ESS 接口并加入业务 VLAN
+[AC]interface WLAN-ESS 1
+[AC-WLAN-ESS1]port access vlan 2
+[AC-WLAN-ESS1]quit
+(3) 配置明文方式的服务模板
+[AC]wlan service-template 1 clear
+[AC-wlan-st-1]ssid ssidh3c
+[AC-wlan-st-1]bind WLAN-ESS 1
+[AC-wlan-st-1]service-template enable
+Please wait... Done.
+[AC-wlan-st-1]quit
+(4) 开启自动 AP 功能
+[AC]wlan auto-ap enable
+[AC]wlan ap 2608 model LA2608 id 1
+[AC-wlan-ap-2608]serial-id auto
+[AC-wlan-ap-2608]radio 1
+[AC-wlan-ap-2608-radio-1]service-template 1
+[AC-wlan-ap-2608-radio-1]radio enable
+[AC-wlan-ap-2608-radio-1]quit
+[AC-wlan-ap-2608]quit
+(5) 配置 VLAN 接口 IP 地址
+[AC]interface Vlan-interface 1
+[AC-Vlan-interface1]ip address 60.191.99.143 255.255.0.0
+[AC-Vlan-interface1]quit
+[AC]interface Vlan-interface 2
+[AC-Vlan-interface2]ip address 10.249.136.1 255.255.252.0
+[AC-Vlan-interface2]quit
+(6) 使能 DHCP 服务，配置 DHCP 地址池
+```
+
+[Context 3 | source=web | url=https://blog.csdn.net/lebiewi/article/details/141424659 | score=0.7158519901163283]
+(1)地址池配置 [Core]dhcpenable //华三一定要注意开启DHCP [Core]dhcpserverip-pool vlan10-dhcp //创建地址池 [Core-dhcp-pool-vlan10-dhcp]network 192.168.10.0 24 //分配的网段与掩码 [Core-dhcp-pool-vlan10-dhcp]gateway-list 192.168.10.254 // 分配的网关地址 [Core-dhcp-pool-vlan10-dhcp]dns-list 114.114.114.114 202.102.154.3 //分配的DNS [Core]interface vlan 10 [H3C-Vlan-interface10]dhcpselectserver //同网段的可以使用全局,其他网段的需要使用relay //V7版本以上也支持允许的ip范围的配置 [Core-dhcp-pool-vlan10]addressrange 192.168.10.1 192.168.10.240 // 它是依赖Network存在的,单独配置不生效。 注意:华三只支持全局地址池形式的,并且大部分版本默认接口开启的模式是dhcp select server模式,不需要去配置,另一种中继模式是dhcp select relay(华为还有个接口模式dhcp select interface ,华三没有接口模式) (2)排除ip地址功能 第一种配置方式:地址池里面 [Core]dhcp server ip-pool vlan10 [Core-dhcp-pool-vlan10]forbidden-ip 192.168.10.250 192.168.10.253 //保留地址范围,注意地址池里面没有范围的概念,必须一个一个的写(最新版本可以支持范围形式) 第二种配置方式:全局视图下 [Core]dhcp server forbidden-ip 192.168.10.250 192.168.10.253 //全局支持范围的形式 //V7版本通常在地址池里面配置,但是实际中可能会遇到V5的版本,该版本只支持全局方式保留 (3)静态绑定 [Core-dhcp-pool-vlan10]static-bind ip-address 192.168.10.6 hardware-address 6e1f-3163-0306 华三设备里面有一个好处就是,绑定的用户在列表里面,也可以在地址池中绑定,这样下次客户端重新获取后是可以获取到绑定的地址了。 还一个比较容易出现的问题就是,华三多个地址是可以绑定一个MAC的,还不报错,可能由于疏忽会导致分配错误。 undo static-bind ip-address 192.168.10.5 可以去掉 这样就获取到了绑定的了。 (4)一定要开边缘端口 如果边缘端口不开的话,获取地址会非常的缓慢,或者获取不到地址 (5)华三维护命令 displaydhcp server pool :查看所有dhcp地址池详情 display dhcp server free-ip :查看DHCP地址池的空闲地址信息 display dhcp server ip-in-use :查看DHCP绑定信息(包括静态跟动态),实际中可能地址分配很多,可以通过后面跟参数来过滤(比如只看某个地址,某个网段等)
+
+[Context 4 | source=local | chunk_id=467914719130005116 | score=0.6588687370216576]
+## 目 录
+
+1 H3C LA2608 室内无线网关用户手册 …… 1
+1.1 概述 …… 1
+1.2 配置LA2608与无线控制器互通 …… 1
+1.2.1 配置LA2608 …… 1
+1.2.2 配置运营商无线控制器 …… 2
+1.2.3 验证LA2608与无线控制器是否连通 …… 3
+
+[Context 5 | source=web | url=https://blog.51cto.com/u_12891160/14250204 | score=0.6041945324906879]
+1. 开启 DHCP 服务 system-view dhcp enable 1. 2. 在全局模式下开启 DHCP 功能,否则无法配置地址池。 2. 配置全局地址池(常用) system-view dhcp server ip-pool POOL_NAME # 新建地址池,例如 POOL1 network 192.168.1.0 mask 255.255.255.0 # 分配的网段 gateway-list 192.168.1.1 # 网关地址 dns-list 8.8.8.8 114.114.114.114 # DNS 服务器 lease day 7 hour 0 minute 0 # 租期(可选,默认1天) quit 1. 2. 3. 4. 5. 6. 7. 3. 配置接口模式地址池(适用于直接在接口下分配) system-view interface Vlan-interface 10 # 进入三层接口(如VLANIF) ip address 192.168.10.1 255.255.255.0 dhcp select interface # 开启接口模式DHCP quit 1. 2. 3. 4. 5. 接口模式下不需要额外指定网段,直接根据接口IP和掩码分配。 4. 静态绑定 IP(MAC 绑定) system-view dhcp server ip-pool POOL_NAME static-bind ip-address 192.168.1.100 mac-address 0011-2233-4455 quit 1. 2. 3. 4. 5. 排除不分配的 IP 地址
+
+[Context 6 | source=local | chunk_id=467914719130005118 | score=0.5738630307939772]
+## 1.1 概述
+
+H3C LA2608-GM/GU 室内无线网关（以下简称 LA2608）可以为用户提供无线服务，为了实现对设备的管理，LA2608需要通过 3G/4G网络连接到运营商无线控制器。
+
+![](images/16288d553bf867b279adb856534213ef37a0d17bdec59c9c4abf824878cd7e56.jpg)
+
+说明
+
+目前，LA2608只支持与 H3C公司的无线控制器互通。
+
+[Context 7 | source=local | chunk_id=467914719130005115 | score=0.5690476425547748]
+# H3C LA2608 室内无线网关
+
+用户手册
+
+Copyright © 2014 杭州华三通信技术有限公司及其许可者 版权所有，保留一切权利。
+
+未经本公司书面许可，任何单位和个人不得擅自摘抄、复制本书内容的部分或全部，并不得以任何形式传播。
+
+H3C、 、Aolynk、 Aolynk 、H<sup>3</sup>Care、 Heare TOP G, TOPG IRF、NetPilot、Neocean、NeoVTL、SecPro、SecPoint、SecEngine、SecPath、Comware、Secware、Storware、NQA、VVG、V<sup>2</sup>G、V<sup>n</sup>G、PSPT、XGbus、N-Bus、TiGem、InnoVision、HUASAN、华三均为杭州华三通信技术有限公司的商标。对于本手册中出现的其它公司的商标、产品标识及商品名称，由各自权利人拥有。
+
+由于产品版本升级或其他原因，本手册内容有可能变更。H3C保留在没有任何通知或者提示的情况下对本手册的内容进行修改的权利。本手册仅作为使用指导，H3C尽全力在本手册中提供准确的信息，但是 H3C 并不确保手册内容完全没有错误，本手册中的所有陈述、信息和建议也不构成任何明示或暗示的担保。
+
+[Context 8 | source=web | url=https://blog.csdn.net/weixin_42525005/article/details/160298934 | score=0.42728505211307344]
+1. 理解多VLAN DHCP服务的基本原理 在开始配置之前,我们需要先理解几个关键概念和它们之间的关系: VLAN(虚拟局域网):将一个物理网络划分为多个逻辑网络的技术,不同VLAN间的通信需要通过三层设备(如路由器或三层交换机)进行路由。 DHCP(动态主机配置协议):自动为网络中的设备分配IP地址、子网掩码、默认网关和DNS服务器等网络参数的协议。 三层接口(VLAN接口):在三层交换机上为VLAN创建的接口,充当该VLAN的网关。 在多VLAN环境中配置DHCP服务时,最关键的是确保每个VLAN的DHCP请求能够被正确的DHCP服务器处理,并且返回的网络参数(特别是网关地址)与客户端所在的VLAN匹配。 1.1 VLAN与DHCP的关联机制 当交换机收到一个DHCP请求时,它会根据以下信息确定如何处理这个请求: 接收请求的端口所属的VLAN:这决定了请求来自哪个逻辑网络。 该VLAN是否配置了VLAN接口(三层接口):这是该VLAN的网关。 VLAN接口是否关联了DHCP地址池:这决定了如何为客户端分配IP地址。 在H3C交换机上,这三者的关系可以用以下表格表示: <table><tr><th>配置元素</th><th>作用</th><th>关联关系</th></tr><tr><td>VLAN</td><td>逻辑网络划分</td><td>基础配置,需要先创建VLAN</td></tr><tr><td>VLAN接口</td><td>作为VLAN的网关</td><td>需要在VLAN创建后配置</td></tr><tr><td>DHCP地址池</td><td>定义IP分配规则</td><td>需要与VLAN接口关联</td></tr></table>
+
+[Context 9 | source=web | url=https://www.cnblogs.com/hywhyme/p/5972291.html | score=0.4043895243428063]
+需求描述 RT1作为DHCP服务器 创建两个全局地址池: 192.168.10.0/24 192.168.20.0/24 RT1和RT3属于VLAN 10 RT2属于VLAN 20 在交换机上配置DHCP中继,确保RT2和RT3都能从RT1处获取IP地址 1、交换机上创建两个vlan vlan 10 vlan 20 2、给vlan 配置上IP地址,作为RT1、RT2、RT3的网关 interface Vlan-interface10 ip address 192.168.10.1 255.255.255.0 # interface Vlan-interface20 ip address 192.168.20.1 255.255.255.0 3、把接口加入相应的VLAN interface Ethernet0/4/0 port link-mode bridge port access vlan 10 # interface Ethernet0/4/1 port link-mode bridge port access vlan 10 # interface Ethernet0/4/2 port link-mode bridge port access vlan 20 # 4、配置RT1,配置IP地址和默认网关 [RT1]int gi 0/0/0 [RT1-GigabitEthernet0/0/0]ip add 192.168.10.2 255.255.255.0 [RT1-GigabitEthernet0/0/0]qu [RT1]ip route-static 0.0.0.0 0.0.0.0 192.168.10.1 5、配置两个全局地址池 启动DHCP服务 dhcp enable 第一个全局地址池 # dhcp server ip-pool vlan10 network 192.168.10.0 mask 255.255.255.0 gateway-list 192.168.10.1 dns-list 202.106.0.20 8.8.8.8 # 第二个全局地址池 # dhcp server ip-pool vlan20 network 192.168.20.0 mask 255.255.255.0 gateway-list 192.168.20.1 dns-list 114.123.11.8 202.106.0.20 # 6、配置DHCP中继 中继配置服务端的出口方向,客户端的入口方向 如果客户端连接在路由器的Ge-0/0/1口上,则在Ge-0/0/1上做中继 如果客户端连接在属于VLAN 20的接口上,则在VLAN20上做中继 交换机上也开启DHCP dhcp enable 指定DHCP服务器的地址(192.168.10.2) dhcp relay server-group 1 ip 192.168.10.2 # interface Vlan-interface20
+
+[Context 10 | source=local | chunk_id=467914719130005119 | score=0.39913933028056137]
+## 1.2 配置LA2608与无线控制器互通
+
+如 图 1 所示，LA2608 安装了SIM卡，通过 3G/4G网络连接到运营商无线控制器，并向用户提供无线服务。关于LA2608的安装方法，请参见“H3C LA2608室内无线网关 快速安装指南”。
+
+图1 配置 LA2608与无线控制器互通
+
+![](images/2436b496658837dfc940d48d8565fa9a9135932ebf6e2c2a25e9fff4f674dd39.jpg)","根据【参考内容】[1] 中“1.2.1 配置LA2608”部分的配置示例：
+
+- **网段（network）**：`10.249.136.0/22`（即子网掩码为 255.255.252.0）  
+- **网关（gateway-list）**：`10.249.136.1`  
+- **DNS服务器（dns-list）**：`218.201.96.130`
+
+该地址池名为 `vlan2`，用于为连接到 LA2608 的终端设备分配 IP 地址。
+
+【图片】
+<images/06474f326a73aa174281952c2d7a262f50b5a813a0a0523744c4cc52374ef0fd.jpg>
+<images/08e8c1c7f9c7f47a615d8449dea68240baed840efe2f63d2a292dceb249bef98.jpg>
+<images/16288d553bf867b279adb856534213ef37a0d17bdec59c9c4abf824878cd7e56.jpg>
+<images/2436b496658837dfc940d48d8565fa9a9135932ebf6e2c2a25e9fff4f674dd39.jpg>",0.9999999999,1.0,0.8,0.7902509912173373,0.7473407716699298
+如何在无线控制器上验证H3C LA2608已经与无线控制器建立连接？,在无线控制器上执行“display wlan ap”命令；如果state字段显示为“R/M”，表示LA2608与无线控制器之间已经建立连接。,"[Context 1 | source=local | chunk_id=467914719130005121 | score=0.9600404645894136]
+## 1.2.1 配置LA2608
+
+```txt
+[AC]dhcp enable
+[AC]dhcp server ip-pool vlan2
+[AC-dhcp-pool-vlan1]network 10.249.136.0 22
+[AC-dhcp-pool-vlan1]gateway-list 10.249.136.1
+[AC-dhcp-pool-vlan1]dns-list 218.201.96.130
+[AC-dhcp-pool-vlan1]quit
+```
+
+## 1.2.3 验证LA2608 与无线控制器是否连通
+
+在无线控制器上执行 display wlan ap 命令，state 字段显示为“R/M”，表示 LA2608 与无线控制器之间已经建立连接。
+
+```txt
+<Sysname> display wlan ap all
+Total Number of APs configured : 1
+Total Number of configured APs connected : 1
+Total Number of auto APs connected : 0
+AP Profiles
+State : I = Idle, J = Join, JA = JoinAck, IL = ImageLoad
+C = Config, R = Run, KU = KeyUpdate, KC = KeyCfm
+M = Master, B = Backup
+```
+
+```csv
+AP Name State Model Serial-ID
+ap1 R/M LA2608 036286A054000033
+```
+
+[Context 2 | source=local | chunk_id=467914719130005116 | score=0.9283760853705093]
+## 目 录
+
+1 H3C LA2608 室内无线网关用户手册 …… 1
+1.1 概述 …… 1
+1.2 配置LA2608与无线控制器互通 …… 1
+1.2.1 配置LA2608 …… 1
+1.2.2 配置运营商无线控制器 …… 2
+1.2.3 验证LA2608与无线控制器是否连通 …… 3
+
+[Context 3 | source=local | chunk_id=467914719130005118 | score=0.8589864974121716]
+## 1.1 概述
+
+H3C LA2608-GM/GU 室内无线网关（以下简称 LA2608）可以为用户提供无线服务，为了实现对设备的管理，LA2608需要通过 3G/4G网络连接到运营商无线控制器。
+
+![](images/16288d553bf867b279adb856534213ef37a0d17bdec59c9c4abf824878cd7e56.jpg)
+
+说明
+
+目前，LA2608只支持与 H3C公司的无线控制器互通。
+
+[Context 4 | source=local | chunk_id=467914719130005119 | score=0.7670764653289639]
+## 1.2 配置LA2608与无线控制器互通
+
+如 图 1 所示，LA2608 安装了SIM卡，通过 3G/4G网络连接到运营商无线控制器，并向用户提供无线服务。关于LA2608的安装方法，请参见“H3C LA2608室内无线网关 快速安装指南”。
+
+图1 配置 LA2608与无线控制器互通
+
+![](images/2436b496658837dfc940d48d8565fa9a9135932ebf6e2c2a25e9fff4f674dd39.jpg)
+
+[Context 5 | source=local | chunk_id=467914719130005120 | score=0.6318870941863557]
+## 1.2.1 配置LA2608
+
+(1) 配置拨号访问组的拨号控制列表
+
+```txt
+<LA2608>system-view
+[LA2608]dialer-rule 1 ip permit
+(2) 配置 DCC 拨号
+```
+
+![](images/06474f326a73aa174281952c2d7a262f50b5a813a0a0523744c4cc52374ef0fd.jpg)
+
+dialer number命令用来配置发起呼叫的拨号串，不同运营商的拨号串不同，请用户在配置前向网络运营商获取发起呼叫的拨号串。
+
+```powershell
+[LA2608]interface Cellular-Ethernet2/0
+[LA2608-Cellular-Ethernet2/0]ip address cellular-allocated
+[LA2608-Cellular-Ethernet2/0]dialer enable-circular
+[LA2608-Cellular-Ethernet2/0]dialer-group 1
+[LA2608-Cellular-Ethernet2/0]dialer timer idle 0
+```
+
+```txt
+[LA2608-Cellular-Ethernet2/0]dialer timer autodial 5
+[LA2608-Cellular-Ethernet2/0]dialer number *99# autodial
+[LA2608-Cellular-Ethernet2/0]nat outbound
+[LA2608-Cellular-Ethernet2/0]quit
+
+(3) 配置 DNS 解析功能
+[LA2608]dns resolve
+
+(4) 配置静态路由
+[LA2608]ip route-static 0.0.0.0 0.0.0.0 Cellular-Ethernet2/0
+
+(5) 指定运营商无线控制器的 IP 地址
+[LA2608] wlan ac ip 60.191.99.143
+```
+
+## 1.2.2 配置运营商无线控制器
+
+![](images/08e8c1c7f9c7f47a615d8449dea68240baed840efe2f63d2a292dceb249bef98.jpg)
+
+## 说明
+
+如下配置仅供参考，运营商可根据实际情况进行调整。
+
+## (1) 创建业务 VLAN
+
+```txt
+(1) 创建业务 VLAN
+<AC>system-view
+[AC]vlan 2
+[AC-vlan2] quit
+(2) 创建 WLAN-ESS 接口并加入业务 VLAN
+[AC]interface WLAN-ESS 1
+[AC-WLAN-ESS1]port access vlan 2
+[AC-WLAN-ESS1]quit
+(3) 配置明文方式的服务模板
+[AC]wlan service-template 1 clear
+[AC-wlan-st-1]ssid ssidh3c
+[AC-wlan-st-1]bind WLAN-ESS 1
+[AC-wlan-st-1]service-template enable
+Please wait... Done.
+[AC-wlan-st-1]quit
+(4) 开启自动 AP 功能
+[AC]wlan auto-ap enable
+[AC]wlan ap 2608 model LA2608 id 1
+[AC-wlan-ap-2608]serial-id auto
+[AC-wlan-ap-2608]radio 1
+[AC-wlan-ap-2608-radio-1]service-template 1
+[AC-wlan-ap-2608-radio-1]radio enable
+[AC-wlan-ap-2608-radio-1]quit
+[AC-wlan-ap-2608]quit
+(5) 配置 VLAN 接口 IP 地址
+[AC]interface Vlan-interface 1
+[AC-Vlan-interface1]ip address 60.191.99.143 255.255.0.0
+[AC-Vlan-interface1]quit
+[AC]interface Vlan-interface 2
+[AC-Vlan-interface2]ip address 10.249.136.1 255.255.252.0
+[AC-Vlan-interface2]quit
+(6) 使能 DHCP 服务，配置 DHCP 地址池
+```
+
+[Context 6 | source=web | url=https://www.h3c.com/cn/Products_And_Solution/InterConnect/Products/IP_Wlan/Products/AP_AC/WX/AC/H3C_QYWX | score=0.593588622483792]
+H3C企业微信合作系列企业级核心多业务无线控制器是新华三技术有限公司(以下简称H3C公司)自主研发的网关型无线控制器 (AC,Access Controller)。 企业微信合作系列无线控制器务类型丰富,集精细的用户控制管理、完善的射频资源管理、7X24小时无线安全管控、二三层快速漫游、灵活的QoS控制、IPv4&IPv6双栈等多功能于一体,提供强大的有线、无线一体化接入能力。本系列为企业微信合作款型,带有华三和企业微信联合logo,支持企业微信对接,实现认证,网管等多种功能。 H3C 企业微信合作系列无线控制器是专门为分支机构,小型园区设计而生。把网关、AC功能集合一体,减少了企业在组网中,购买设备的种类和数量,减少投资。配合H3C Fit AP产品系列,主流的热门功能如WIPS、防火墙等功能全部具备。同时具有丰富的端口类型,尤其自带一个USB接口,可连接企业相关外设。 H3C 企业微信合作系列无线控制器包含AC1016和AC1108二款型号。配合H3C 企业微信合作款型 AP产品系列,可以满足小型企业园区WLAN接入、分支机构热点覆盖等无线场景的典型应用。 AC1108运营级核心多业务无线控制器设备外观图 AC1016运营级核心多业务无线控制器设备外观图 支持企业微信对接 支持配合企业微信客户端和企业微信云,进行PPSK方式的接入认证,支持企业微信客户端对设备进行设备管理和基本无线配置。","在无线控制器上验证 H3C LA2608 是否已建立连接，需执行以下命令并检查输出状态：
+
+1. 在无线控制器命令行界面输入以下命令：  
+   `display wlan ap all`
+
+2. 查看返回结果中对应 LA2608 的 `State` 字段：  
+   - 若显示为 **`R/M`**（表示 Run/Master），则说明 LA2608 已成功上线并与无线控制器建立连接；  
+   - 示例输出：  
+     ```
+     AP Name   State   Model   Serial-ID
+     ap1       R/M     LA2608  036286A054000033
+     ```
+
+> ⚠️ 注意：  
+> - `R/M` 是唯一明确表示连接成功的状态标识（`R` = Run，`M` = Master）；  
+> - 其他状态如 `I`（Idle）、`J`（Join）、`C`（Config）等均表示尚未完成上线流程。
+
+【图片】
+images/16288d553bf867b279adb856534213ef37a0d17bdec59c9c4abf824878cd7e56.jpg
+images/2436b496658837dfc940d48d8565fa9a9135932ebf6e2c2a25e9fff4f674dd39.jpg",0.699999999965,1.0,0.6363636363636364,0.9702073772878181,0.5660134729681692

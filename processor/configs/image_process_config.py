@@ -11,7 +11,7 @@ DEFAULT_IMAGE_EXTENSIONS = frozenset({".jpg", ".jpeg", ".png", ".gif", ".bmp", "
 
 class ImageProcessConfig(AppBaseSettings):
     context_length: int = Field(
-        default=100,
+        default=200,
         gt=0,
         validation_alias="IMPORT_IMG_CONTENT_LENGTH",
     )

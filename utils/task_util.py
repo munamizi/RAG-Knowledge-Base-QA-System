@@ -1,5 +1,7 @@
 """
 `导入图`和`查询图`任务状态管理模块：
+    1.对于导入图，正常通过函数更新进下面的数据结构中
+    2.对于查询图（流式），把状态内容push进session_id对应队列中，供后续SSE后端发送给前端
 
     数据结构：
         ①任务整体状态_tasks_status（pending、processing、completed / failed）
@@ -168,16 +170,21 @@ def update_task_status(task_id: str, status_name: str, push_queue: bool = False)
         TASK_STATUS_FAILED,
     }:
         _tasks_running_list[task_id] = []
+
     if push_queue:
         task_push_queue(task_id)
 
 
 def task_push_queue(task_id: str):
-    push_to_session(task_id, "progress", {
-        "status": get_task_status(task_id),
-        "done_list": get_done_task_list(task_id),
-        "running_list": get_running_task_list(task_id),
-    })
+    push_to_session(
+        task_id,
+        "progress",
+        {
+            "status": get_task_status(task_id),
+            "done_list": get_done_task_list(task_id),
+            "running_list": get_running_task_list(task_id),
+        }
+    )
 
 
 def clear_task(task_id: str):

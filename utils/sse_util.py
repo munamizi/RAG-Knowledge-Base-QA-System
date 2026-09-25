@@ -1,42 +1,48 @@
 """
-    1.负责记录SSE的事件
-    2.定义SSE生成器
+SSE工具模块：
+    1.定义SSE的事件类型
+    2.维护session_id队列字典
+    3.定义SSE后端生成器
 """
-
 import json
 import queue
 import asyncio
 from typing import Dict, Any, Optional, AsyncGenerator
 from fastapi import Request
 
-# 定义的SSE事件
+# ——————————————————————————————————————  定义的SSE事件类型  ———————————————————————————————————————
 class SSEEvent:
     READY = "ready"         # 建立连接
-    PROGRESS = "progress"   # 检索图节点执行进度
+    PROGRESS = "progress"   # 查询图节点执行进度
     DELTA = "delta"         # LLM 流式输出
     FINAL = "final"         # 最终完整答案和图片
-    ERROR = "error"         # 错误信息
-    CLOSE = "__close__"     # 通知生成器关闭连接信号
+    ERROR = "error"         # 错误
+    CLOSE = "__close__"     # 生成器关闭信号
 
 
-# 全局会话队列字典
+# ——————————————————————————————————————  session_id队列字典和配套函数  ———————————————————————————————————————
+# session_id队列字典
 _session_stream_dict: Dict[str, "queue.Queue"] = {}
 
 
-def get_sse_queue(session_id: str) -> Optional["queue.Queue"]:
-    """获取指定session_id的队列"""
-    return _session_stream_dict.get(session_id)
-
-
 def create_sse_queue(session_id: str) -> "queue.Queue":
-    """创建指定session_id的队列"""
+    """创建 指定session_id的队列"""
     q = queue.Queue()
     _session_stream_dict[session_id] = q
     return q
 
+def get_sse_queue(session_id: str) -> Optional["queue.Queue"]:
+    """获取 指定session_id队列"""
+    return _session_stream_dict.get(session_id)
+
+def push_to_session(session_id: str, event: str, data: Dict[str, Any]):
+    """存放数据到 指定session_id队列 """
+    stream_queue = get_sse_queue(session_id)
+    if stream_queue:
+        stream_queue.put({"event": event, "data": data})
 
 def remove_sse_queue(session_id: str):
-    """删除指定session_id的队列"""
+    """删除 指定session_id的队列"""
     _session_stream_dict.pop(session_id, None)
 
 
@@ -46,23 +52,15 @@ def _sse_pack(event: str, data: Dict[str, Any]) -> str:
     return f"event: {event}\ndata: {payload}\n\n"
 
 
-def push_to_session(session_id: str, event: str, data: Dict[str, Any]):
-    """
-    通过 session_id 放数据
-    """
-    stream_queue = get_sse_queue(session_id)
-    if stream_queue:
-        stream_queue.put({"event": event, "data": data})
-
-
+# ——————————————————————————————————————  定义SSE后端生成器  ———————————————————————————————————————
 async def sse_generator(session_id: str, request: Request) -> AsyncGenerator[str, None]:
-    """SSE 生成器"""
+
     stream_queue = get_sse_queue(session_id)
     if stream_queue is None:
         return
 
     try:
-        # 发送连接建立信号
+        # 发送初始连接建立信号
         yield _sse_pack("ready", {})
 
         while True:
@@ -83,9 +81,10 @@ async def sse_generator(session_id: str, request: Request) -> AsyncGenerator[str
             if event == "__close__":
                 break
 
+            # 发送
             yield _sse_pack(event, data)
+
     except (asyncio.CancelledError, ConnectionResetError, BrokenPipeError):
         return
     finally:
         remove_sse_queue(session_id)
-
