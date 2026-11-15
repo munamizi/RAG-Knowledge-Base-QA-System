@@ -27,7 +27,6 @@ class NodeDocumentSplit(BaseNode):
             state[md_path] - 新 md文件路径
             state[md_content] - 新 md文件内容
             state[file_title] - 上传资料文件名
-
         Returns:
              state[chunks]: list[dict] - 切分后的chunks
 

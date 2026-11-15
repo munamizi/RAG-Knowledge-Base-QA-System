@@ -47,7 +47,7 @@
 
         clear_task - 清除任务
 """
-from typing import Dict, List
+from typing import Any, Dict, List
 from .sse_util import push_to_session
 
 
@@ -134,12 +134,12 @@ def add_done_task(task_id: str, node_name: str, is_stream: bool = False) -> None
     if is_stream:
         task_push_queue(task_id)
 
-def set_task_result(task_id: str, key: str, value: str) -> None:
+def set_task_result(task_id: str, key: str, value: Any) -> None:
     """存储 task_id 任务结果字段。"""
     _ensure_task(task_id)
     _tasks_result[task_id][key] = value
 
-def get_task_result(task_id: str, key: str, default: str = "") -> str:
+def get_task_result(task_id: str, key: str, default: Any = "") -> Any:
     """获取 task_id 任务结果对应字段（如 answer / error）。"""
     _ensure_task(task_id)
     return _tasks_result.get(task_id, {}).get(key, default)

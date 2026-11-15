@@ -5,6 +5,7 @@ from processor.query_processor.BaseNode import BaseNode
 from processor.query_processor.prompt.search_embedding_hyde import HYDE_PROMPT
 from processor.query_processor.state import QueryGraphState
 from utils.embedding_util import generate_embeddings
+from utils.citation_util import RETRIEVAL_OUTPUT_FIELDS
 from utils.llm_util import get_llm_client
 from utils.logger import logger
 from utils.milvus_client_util import get_milvus_client
@@ -140,7 +141,7 @@ class NodeSearchEmbeddingHyde(BaseNode):
                 collection_name=collection_name,
                 reqs=reqs,
                 ranker_weights=(0.8, 0.2),
-                output_fields=["chunk_id", "content", "item_name"],
+                output_fields=RETRIEVAL_OUTPUT_FIELDS,
             )
 
             return res[0] if res else []

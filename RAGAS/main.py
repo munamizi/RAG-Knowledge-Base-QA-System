@@ -232,13 +232,14 @@ def load_test_dataset() -> list[EvaluationRecord]:
 def _collect_contexts_seen_by_generator(
     final_state: dict[str, Any],
 ) -> tuple[list[str], list[dict[str, Any]]]:
-    """提取真正进入答案生成提示词的 Rerank 文档。
+    """优先使用生成节点实际采用的来源快照，旧结果兼容旧的预算计算。"""
 
-    NodeAnswerOutput 会按 MAX_CONTEXT_CHARS 从 reranked_docs 的头部依次加入文档。
-    这里复用同样的字符预算和元数据长度计算，避免把已被生成阶段截掉的文档误报为
-    retrieved_contexts。传给 RAGAS 的 contexts 只保留正文；用于排查 bad case 的
-    details 则额外保留来源、chunk_id、URL 和 Rerank 分数。
-    """
+    if "reference_sources" in final_state:
+        sources = final_state["reference_sources"] or []
+        return (
+            [source["content"] for source in sources],
+            [{**source, "rank": source["id"]} for source in sources],
+        )
 
     contexts: list[str] = []
     context_details: list[dict[str, Any]] = []
@@ -249,7 +250,7 @@ def _collect_contexts_seen_by_generator(
         if not content:
             continue
 
-        # 与 NodeAnswerOutput._format_reranked_docs 的格式和长度算法保持一致。
+        # 兼容加入 reference_sources 之前的工作流结果。
         metadata_tags = [f"[{index}]"]
         for field_name, template in (
             ("source", "[source={}]"),

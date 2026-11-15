@@ -74,8 +74,7 @@ class NodeRerank(BaseNode):
         # 1. 获取本地 RRF （普通检索+HyDE检索）的文档
         for rrf_doc in state.get('rrf_chunks') or []:
             format_rrf_doc = {
-                "content": rrf_doc.get('content'),
-                "chunk_id": rrf_doc.get('chunk_id'),
+                **rrf_doc,
                 "url": None,
                 "source": "local"
             }
@@ -84,6 +83,7 @@ class NodeRerank(BaseNode):
         # 2. 获取 web search的文档
         for web_doc in state.get('web_search_docs') or []:
             format_web_doc = {
+                "title": web_doc.get('title'),
                 "content": web_doc.get('snippet'),
                 "chunk_id": None,
                 "url": web_doc.get('url'),

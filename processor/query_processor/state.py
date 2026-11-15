@@ -1,9 +1,7 @@
 from typing import TypedDict, List
 
 class QueryGraphState(TypedDict):
-    """
-    查询流程图状态字典
-    """
+    """查询流程图状态"""
 
     session_id: str  # 会话ID
     message_id: str  # 消息ID
@@ -20,8 +18,11 @@ class QueryGraphState(TypedDict):
     reranked_docs: list  # 重排序后的最终 Top-K 文档
 
     # ——————————生成的数据—————————————
-    prompt: str  # 组装好的 Prompt
-    answer: str  # 最终生成的答案
+    prompt: str              # 组装好的 Prompt
+    answer: str              # 最终生成的答案
+    reference_sources: list  # 进入本轮llm生成的编号-文本块对应表
+    citations: list          # 答案实际引用的来源及内容快照
+    citation_warnings: list  # 无效编号或未引用提示；不代表语义正确性判断
 
     # ——————————辅助——————————————————
     item_names: List[str]  # 提取的商品名

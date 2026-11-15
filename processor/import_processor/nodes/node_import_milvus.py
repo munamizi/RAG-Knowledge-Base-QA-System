@@ -19,17 +19,15 @@ class NodeImportMilvus(BaseNode):
         """
         chunks存入milvus的kb_chunks集合
 
-        内容：
+        步骤：
             1. 输入校验，返回稠密向量维度(方便后续创建集合)
             2. 创建milvus集合kb_chunks，保证幂等性
             3. 批量插入：chunck批量入库，回填Milvus自增chunk_id到state[chunks]
 
         Args:
-            chunks[state]
-
+            state[chunks]
         Returns:
             chunks字段回填chunk_id
-
         """
 
         # chunks有效性校验，返回校验后chunks和稠密向量维度
@@ -59,10 +57,8 @@ class NodeImportMilvus(BaseNode):
 
         Args:
             state[chunks]
-
         Returns:
             (chunks, 稠密向量维度)
-
         """
 
         # 校验chunks非空

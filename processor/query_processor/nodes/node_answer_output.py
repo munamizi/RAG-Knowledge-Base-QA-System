@@ -5,6 +5,7 @@ from processor.query_processor.BaseNode import BaseNode
 from processor.query_processor.prompt.node_answer_output import ANSWER_PROMPT
 from processor.query_processor.state import QueryGraphState
 from utils.llm_util import get_llm_client
+from utils.citation_util import build_reference_context, resolve_citations
 from utils.logger import logger
 from utils.mongo_history_utils import save_chat_message
 from utils.sse_util import push_to_session, SSEEvent
@@ -41,6 +42,10 @@ class NodeAnswerOutput(BaseNode):
               }
         """
 
+        # 引用编号只在本轮有效，不能继承历史或上一轮的来源。
+        state["reference_sources"] = []
+        state["citations"] = []
+        state["citation_warnings"] = []
         # 1. 检查answer是否存在, 如果存在直接输出answer
         answer_exists = self._check_answer(state)
 
@@ -48,12 +53,22 @@ class NodeAnswerOutput(BaseNode):
         if not answer_exists:
             prompt = self._construct_prompt(state)
             state["prompt"] = prompt
-            self._generate_response(state, prompt)
+            if state["reference_sources"]:
+                self._generate_response(state, prompt)
+            else:
+                state["answer"] = "根据现有资料无法确定，请补充相关手册或更具体的问题。"
+                self._check_answer(state)
 
+        state["citations"], state["citation_warnings"] = resolve_citations(
+            state.get("answer") or "", state["reference_sources"]
+        )
+        # 普通响应与 SSE final 使用同一份结果。
+        for key in ("answer", "citations", "citation_warnings"):
+            set_task_result(state["session_id"], key, state[key])
 
         # 2. 把答案写入到mongodb的history中
         # 提取图片URL（用于历史记录和前端展示）
-        image_urls = self._extract_images_from_docs(state.get("reranked_docs") or [])
+        image_urls = self._extract_images_from_docs(state["reference_sources"])
         if state.get("answer"):
             logger.info("---写入MongoDB历史记录---")
             self._write_history(state, image_urls=image_urls)
@@ -68,7 +83,9 @@ class NodeAnswerOutput(BaseNode):
                 {
                     "answer": state["answer"],
                     "status": "completed",
-                    "image_urls": image_urls
+                    "image_urls": image_urls,
+                    "citations": state["citations"],
+                    "citation_warnings": state["citation_warnings"],
                 }
             )
 
@@ -111,12 +128,13 @@ class NodeAnswerOutput(BaseNode):
 
         # 获取问题和提取商品名（优先使用重写后的问题）
         question = state.get("rewritten_query") or state.get("original_query", "")
-        item_names = state["item_names"]
+        item_names = state.get("item_names") or []
 
         # 格式化rerank切片
-        context_str, char_budget = self._format_reranked_docs(
+        context_str, references, char_budget = self._format_reranked_docs(
             state.get("reranked_docs") or [], char_budget
         )
+        state["reference_sources"] = references
 
         # 格式化历史对话
         history_str, char_budget = self._format_chat_history(
@@ -139,42 +157,11 @@ class NodeAnswerOutput(BaseNode):
 
 
 
-    def _format_reranked_docs(self, reranked_docs: List[Dict], char_budget: int) -> Tuple[str, int]:
-        """
-            格式化重排序文档，带字符预算控制
-             "[1] [local] [chunk_id=123] [score=0.95] [title=操作手册]这里是文档的正文内容..."
-                如果超过 MAX_CONTEXT_CHARS (如 12000 字符)，则停止添加
-        """
-        formatted_lines = []
-        used_chars = 0
-
-
-        for idx, doc in enumerate(reranked_docs, start=1):
-            content = doc.get("content")
-            meta_tags = [f"[{idx}]"]
-            for field, template in [
-                ("source", "[source={}]"),
-                ("chunk_id", "[chunk_id={}]"),
-                ("url", "[url={}]"),
-                ("title", "[title={}]"),
-            ]:
-                field_value = str(doc.get(field)).strip()
-                if field_value:
-                    meta_tags.append(template.format(field_value))
-
-            relevance_score = doc.get("score")
-            if relevance_score is not None:
-                meta_tags.append(f"[score={float(relevance_score):.4f}]")
-
-            doc_entry = " ".join(meta_tags) + "\n" + content
-
-            if used_chars + len(doc_entry) > char_budget:
-                break
-
-            formatted_lines.append(doc_entry)
-            used_chars += len(doc_entry) + 2
-
-        return "\n\n".join(formatted_lines), char_budget - used_chars
+    def _format_reranked_docs(
+        self, reranked_docs: List[Dict], char_budget: int
+    ) -> tuple[str, list[dict], int]:
+        """同时生成上下文与引用表，避免预算截断后编号和出处错位。"""
+        return build_reference_context(reranked_docs, char_budget)
 
 
 
@@ -232,11 +219,13 @@ class NodeAnswerOutput(BaseNode):
                         push_to_session(session_id, SSEEvent.DELTA, {"delta": delta})
 
                 logger.info(f"流式输出完成，总长度: {len(final_text)}")
+                if not final_text.strip():
+                    raise ValueError("模型未返回有效答案")
 
             except Exception as e:
                 logger.error(f"流式生成出错: {e}", exc_info=True)
-                # 发生错误时，尝试推送到前端
-                push_to_session(session_id, SSEEvent.ERROR, {"error": str(e)})
+                # 由工作流入口发送 error；失败的部分答案不保存为完整引用结果。
+                raise
 
             state["answer"] = final_text
         else:
@@ -245,12 +234,13 @@ class NodeAnswerOutput(BaseNode):
             try:
                 response = llm.invoke(prompt)
                 content = response.content
+                if not isinstance(content, str) or not content.strip():
+                    raise ValueError("模型未返回有效文本答案")
                 state["answer"] = content
-                set_task_result(session_id, "answer", content)
                 logger.info(f"生成回答完成，长度: {len(content)}")
             except Exception as e:
                 logger.error(f"生成回答出错: {e}", exc_info=True)
-                state["answer"] = "抱歉，生成回答时出现错误。"
+                raise
 
         return state
 
@@ -345,7 +335,9 @@ class NodeAnswerOutput(BaseNode):
                     rewritten_query="",
                     item_names=item_names,
                     image_urls=image_urls,
-                    message_id=None
+                    message_id=None,
+                    citations=state.get("citations") or [],
+                    citation_warnings=state.get("citation_warnings") or [],
                 )
         except Exception as e:
 

@@ -86,7 +86,9 @@ def save_chat_message(
         rewritten_query: str = "",
         item_names: List[str] = None,
         image_urls: List[str] = None,
-        message_id: str = ""
+        message_id: str = "",
+        citations: List[Dict[str, Any]] = None,
+        citation_warnings: List[Dict[str, Any]] = None,
 ) -> str:
     """
     写入/更新单条会话记录到chat_message集合
@@ -99,6 +101,8 @@ def save_chat_message(
         item_names: 关联的商品名称列表（可选，支持多商品，默认None）
         image_urls: 关联的图片URL列表（可选，默认None）
         message_id: 主键ID（可选，有值则更新，无值则新增）
+        citations: 本条答案引用的来源快照，历史记录不依赖当前向量库内容
+        citation_warnings: 本条答案的引用编号检查结果
 
     Returns:
         插入/更新的记录唯一标识（新增返回ObjectId字符串，更新返回传入的message_id）
@@ -110,6 +114,8 @@ def save_chat_message(
         "rewritten_query": rewritten_query or "",   # 问题优化后的改写，空值处理为空字符串
         "item_names": item_names,                   # 关联商品名称列表
         "image_urls": image_urls,                   # 关联图片URL列表
+        "citations": citations or [],
+        "citation_warnings": citation_warnings or [],
         "ts": datetime.now().timestamp()            # 时间戳（秒级），记录消息的创建时间，用于排序和查询
     }
 
@@ -158,7 +164,7 @@ def update_message_item_names(ids: List[str], item_names: List[str]) -> int:
 
 
 
-def get_recent_messages(session_id: str, limit: int = 10) -> List[Dict[str, Any]]:
+def get_recent_messages(session_id: str, limit: int = 20) -> List[Dict[str, Any]]:
     """
     查询指定会话的最近N条对话记录，返回原始字典格式
     结果按时间正序排列，可直接喂给LLM作为上下文

@@ -11,7 +11,6 @@ PAGE_DIR = Path(__file__).resolve().parents[2] / "frontend"
 
 
 
-# 创建FastAPI实例
 app = FastAPI(
     title="RAG知识库",
     description="知识库导入与检索问答服务",

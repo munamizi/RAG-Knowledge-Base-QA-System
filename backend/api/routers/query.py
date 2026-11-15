@@ -15,12 +15,13 @@ from pydantic import BaseModel, Field
 from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
 from starlette.responses import FileResponse, StreamingResponse
+from starlette.concurrency import run_in_threadpool
 
 from processor.query_processor.main_graph import KBQueryWorkflow
 from utils.mongo_history_utils import clear_history, get_recent_messages
 from utils.sse_util import create_sse_queue, push_to_session, SSEEvent, sse_generator
 from utils.task_util import update_task_status, TASK_STATUS_PROCESSING, get_task_result, TASK_STATUS_COMPLETED, \
-    TASK_STATUS_FAILED, clear_task
+    TASK_STATUS_FAILED, clear_task, get_task_status
 
 
 query_router = APIRouter(
@@ -60,25 +61,30 @@ async def query(background_tasks: BackgroundTasks, request: QueryRequest):
 
     print("开始处理流程... 是否流式:", is_stream, f"其他参数:{user_query}, session_id:{session_id}")
 
-    # 如果是流式，提交后台任务执行查询图，通过SSE后端返回响应
+    # 流式:提交后台任务执行查询图，通过SSE后端返回响应
     if is_stream:
         background_tasks.add_task(run_query_graph, session_id, user_query, is_stream)
         return {
             "message":"结果正在处理中...",
             "session_id":session_id
         }
-    # 如果非流式，直接执行查询图，返回响应
+
+    # 非流式:直接执行查询图，返回响应
     else:
-        run_query_graph(session_id, user_query, is_stream)
+        await run_in_threadpool(run_query_graph, session_id, user_query, is_stream)
+        if get_task_status(session_id) == TASK_STATUS_FAILED:
+            raise HTTPException(status_code=502, detail="问答生成失败，请稍后重试。")
         answer = get_task_result(session_id, "answer", "")
         return {
             "message":"处理完成！",
             "session_id":session_id,
             "answer":answer,
+            "citations": get_task_result(session_id, "citations", []),
+            "citation_warnings": get_task_result(session_id, "citation_warnings", []),
             "done_list":[]
         }
 
-# 流式开：对应具体后台任务
+# 流式对应具体后台任务
 def run_query_graph(session_id: str, user_query: str, is_stream: bool = True):
     """初始化状态，执行检索图"""
     print(f"开始流程图处理...{session_id} {user_query} {is_stream}")
@@ -98,6 +104,9 @@ def run_query_graph(session_id: str, user_query: str, is_stream: bool = True):
         update_task_status(session_id, TASK_STATUS_FAILED, is_stream)
         if is_stream:
             push_to_session(session_id, SSEEvent.ERROR, {"error": str(e)})
+    finally:
+        if is_stream:
+            push_to_session(session_id, SSEEvent.CLOSE, {})
 
 
 
@@ -138,6 +147,8 @@ async def history(session_id: str, limit: int = 50):
                 "rewritten_query": r.get("rewritten_query", ""),
                 "item_names": r.get("item_names", []),
                 "image_urls": r.get("image_urls") or [],
+                "citations": r.get("citations") or [],
+                "citation_warnings": r.get("citation_warnings") or [],
                 "ts": r.get("ts")
             })
         return {"session_id": session_id, "items": items}

@@ -57,10 +57,8 @@ class NodeBGEEmbedding(BaseNode):
 
         Args:
             state[chunks]
-
         Returns:
             List[Dict] - 校验通过的文本切片列表
-
         Raise:
             StateFieldError
 
@@ -89,10 +87,8 @@ class NodeBGEEmbedding(BaseNode):
 
         Args:
             chunks: List[Dict] 待向量化的文本切片列表
-
         Returns:
             List[Dict] 包含 dense_vector / sparse_vector 字段的文本切片列表
-
         """
 
         # 初始化结果列表[dict]

@@ -2,6 +2,7 @@ from processor.configs.milvus_config import milvus_config
 from processor.query_processor.BaseNode import BaseNode
 from processor.query_processor.state import QueryGraphState
 from utils.embedding_util import generate_embeddings
+from utils.citation_util import RETRIEVAL_OUTPUT_FIELDS
 from utils.logger import logger
 from utils.milvus_client_util import get_milvus_client
 from utils.milvus_hybrid_search_util import create_hybrid_search_requests, hybrid_search
@@ -71,7 +72,7 @@ class NodeSearchEmbedding(BaseNode):
                 collection_name=collection_name,
                 reqs=reqs,
                 ranker_weights=(0.8, 0.2),
-                output_fields=["chunk_id", "content", "item_name"]
+                output_fields=RETRIEVAL_OUTPUT_FIELDS
             )
 
             # 7、构造并返回结果：若检索结果非空，取res[0]，否则返回空列表
